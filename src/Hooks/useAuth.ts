@@ -8,7 +8,6 @@ import { jwtDecode } from 'jwt-decode'
 
 export const baseURL = 'https://localhost:8000';
 
-// Login hook
 export const useLogin = () => {
     const [loadingLogin, setLoadingLogin] = useState(false);
     const [loginSuccess, setLoginSuccess] = useState(false);
@@ -22,7 +21,7 @@ export const useLogin = () => {
             const response = await api.post('/auth/login', credentials);
             const { token, user } = response.data;
             storage.setToken(token);
-            localStorage.setItem('Leon_user', JSON.stringify(user)); // Only runs on the client
+            localStorage.setItem('Leon_user', JSON.stringify(user)); 
             setLoginSuccess(true);
            
             return response.data;
@@ -44,9 +43,9 @@ export const useLogin = () => {
     };
 };
 
-// Check if the user is logged in (JWT token validation)
+
 export const isLoggedIn = () => {
-    if (typeof window === 'undefined') return false; // Prevents SSR errors
+    if (typeof window === 'undefined') return false; 
     const token = storage.getToken();
     if (token) {
         const decodedToken: { exp: number } = jwtDecode(token);
@@ -66,7 +65,6 @@ export const isLoggedIn = () => {
     return false;
 };
 
-// Users hook (fetch, add, update, delete)
 export const useUsers = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -121,7 +119,6 @@ export const useUsers = () => {
         }
     };
 
-    // Error handling function
     const handleUserError = (error: any) => {
         if (error.response) {
             const { error: errorMessage, message } = error.response.data;

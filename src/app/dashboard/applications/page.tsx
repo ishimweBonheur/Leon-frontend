@@ -1,13 +1,19 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useJobApplication } from "@/Hooks/applications";
 
 interface Application {
   _id: string;
-  user: string; // This would represent the applicant's ID
-  job: string; // Job ID
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  job: {
+    _id: string;
+    title: string;
+  };
   cv: string;
   coverLetter: string;
   portfolioUrl: string;
@@ -28,23 +34,27 @@ export default function ManageApplicationsPage() {
     currentPage * applicationsPerPage
   );
 
-  // Fetch all applications on mount
   useEffect(() => {
     const fetchApplications = async () => {
-      const result = await getApplicationsByStatus("Pending"); // Or remove filter if needed
-      if (result) {
-        const mappedApplications = result.map((app: Application) => ({
-          _id: app._id,
-          user: app.user,
-          job: app.job,
-          cv: app.cv,
-          coverLetter: app.coverLetter,
-          portfolioUrl: app.portfolioUrl,
-          githubUrl: app.githubUrl,
-          linkedInProfile: app.linkedInProfile,
-          status: app.status,
-        }));
-        setApplications(mappedApplications);
+      try {
+        const result = await getApplicationsByStatus("Pending");
+        if (result) {
+          setApplications(
+            result.map((app: any) => ({
+              _id: app._id,
+              user: app.user,
+              job: app.job,
+              cv: app.cv,
+              coverLetter: app.coverLetter,
+              portfolioUrl: app.portfolioUrl,
+              githubUrl: app.githubUrl,
+              linkedInProfile: app.linkedInProfile,
+              status: app.status,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch applications:", error);
       }
     };
 
@@ -52,14 +62,16 @@ export default function ManageApplicationsPage() {
   }, []);
 
   const handleUpdateStatus = async (applicationId: string, newStatus: string) => {
-    await updateApplicationStatus(applicationId, newStatus);
-
-    // Update frontend state immediately
-    setApplications((prevApps) =>
-      prevApps.map((app) =>
-        app._id === applicationId ? { ...app, status: newStatus } : app
-      )
-    );
+    try {
+      await updateApplicationStatus(applicationId, newStatus);
+      setApplications(prevApps =>
+        prevApps.map(app =>
+          app._id === applicationId ? { ...app, status: newStatus } : app
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
   };
 
   return (
@@ -89,9 +101,9 @@ export default function ManageApplicationsPage() {
               {applicationsToDisplay.length > 0 ? (
                 applicationsToDisplay.map((app) => (
                   <tr key={app._id} className="border-b dark:border-gray-600">
-                    <td className="py-3 px-4">{app.user}</td>
-                    <td className="py-3 px-4">{app.job}</td>
-                    <td className="py-3 px-4">{app.user}</td> {/* You might replace this with applicant's email */}
+                    <td className="py-3 px-4">{app.user.name}</td>
+                    <td className="py-3 px-4">{app.job.title}</td>
+                    <td className="py-3 px-4">{app.user.email}</td> 
                     <td className="py-3 px-4">
                       <Link
                         href={app.cv}

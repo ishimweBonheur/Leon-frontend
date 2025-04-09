@@ -12,25 +12,25 @@ const Blog = () => {
     offset: ["start end", "end start"],
   });
 
-  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.5, 1]);
+  const sectionScale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
+  const sectionOpacity = useTransform(scrollYProgress, [0, 1], [0.5, 1]);
+
+  const blogScale = useTransform(scrollYProgress, [0, 1], [0.95, 1]);
 
   return (
     <motion.section
       ref={ref}
       id="blog"
       className="bg-gray-light dark:bg-bg-color-dark py-16 md:py-20 lg:py-28"
-      style={{ opacity, scale }}
+      style={{ opacity: sectionOpacity, scale: sectionScale }}
     >
       <div className="container">
-        {/* Section Title */}
         <SectionTitle
           title="Our Latest Blogs"
           paragraph="Stay updated with the latest trends, insights, and best practices in HR management. Our expert articles cover employee engagement, recruitment strategies, and technology innovations that drive modern HR solutions."
           center
         />
 
-        {/* Blog Grid */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 md:gap-x-6 lg:gap-x-8 xl:grid-cols-3">
           {blogData.map((blog, index) => (
             <motion.div
@@ -41,9 +41,7 @@ const Blog = () => {
               transition={{ duration: 0.6, delay: index * 0.2 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.05 }}
-              style={{
-                scale: useTransform(scrollYProgress, [0, 1], [0.95, 1]),
-              }}
+              style={{ scale: blogScale }} 
             >
               <SingleBlog blog={blog} />
             </motion.div>

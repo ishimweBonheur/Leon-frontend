@@ -4,9 +4,7 @@ import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NewsLatterBox from "./NewsLatterBox";
-import { db } from "../../utils/firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { motion } from "framer-motion"; // Import Framer Motion
+import { motion } from "framer-motion"; 
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -30,15 +28,8 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "contactMessages"), {
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
-        timestamp: new Date(),
-      });
-
       toast.success("Your message has been sent successfully!");
-      setFormData({ name: "", email: "", message: "" }); 
+      setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error("Failed to send message:", error);
       toast.error("Failed to send your message. Please try again.");
@@ -48,10 +39,7 @@ const Contact = () => {
   };
 
   return (
-    <section
-      id="contact"
-      className="overflow-hidden py-16 md:py-20 lg:py-28"
-    >
+    <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">
       <div className="container">
         <div className="-mx-4 flex flex-wrap">
           <motion.div
@@ -65,9 +53,9 @@ const Contact = () => {
                 Need HR Support? Open a Ticket
               </h2>
               <p className="mb-12 text-base font-medium text-body-color">
-                Our dedicated HR support team is here to help. Reach out with
-                your queries, and we'll respond promptly via email.
+                Our dedicated HR support team is here to help. Reach out with your queries, and we'll respond promptly via email.
               </p>
+
               <motion.form
                 onSubmit={handleSubmit}
                 initial={{ opacity: 0 }}

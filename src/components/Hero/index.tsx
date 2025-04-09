@@ -1,6 +1,6 @@
 "use client";
-import { motion} from "framer-motion"
-import Link from "next/link"; // ✅ Add this line
+import { motion } from "framer-motion"
+import Link from "next/link";
 
 
 const Hero = () => {
@@ -17,7 +17,7 @@ const Hero = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0, ease: "easeOut" }}
                 viewport={{ once: true }}
                 className="mx-auto max-w-[800px] text-center"
               >
@@ -38,8 +38,9 @@ const Hero = () => {
                   viewport={{ once: true }}
                   className="mb-8 text-base leading-relaxed text-body-color dark:text-body-color-dark sm:text-lg md:text-xl"
                 >
-                  At Léon Services, we streamline workforce management and recruitment for forward-thinking companies. Whether you're seeking top-tier talent or looking to outsource HR operations, our personalized solutions help you save time, minimize administrative load, and access pre-screened professionals eager to drive your success.
+                  At Léon Services, we streamline workforce management and recruitment for forward-thinking companies. Whether you&rsquo;re seeking top-tier talent or looking to outsource HR operations, our personalized solutions help you save time, minimize administrative load, and access pre-screened professionals eager to drive your success.
                 </motion.p>
+
 
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 1.05 }}>

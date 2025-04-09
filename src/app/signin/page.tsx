@@ -23,10 +23,10 @@ const SigninPage = () => {
     console.log(response);
     if (response) {
       toast.success("Login successful!");
-      if(response.user.Role=== "admin"){
-      router.push("/dashboard");
+      if (response.user.Role === "admin") {
+        router.push("/dashboard");
       }
-      else{
+      else {
         router.push("/");
       }
     } else if (response?.error) {
@@ -106,11 +106,13 @@ const SigninPage = () => {
                 </div>
               </form>
               <p className="text-center text-base font-medium text-body-color">
-                Don't you have an account?{" "}
+                Don&apos;t you have an account?{" "}
                 <Link href="/signup" className="text-primary hover:underline">
                   Sign up
                 </Link>
               </p>
+
+
             </div>
           </div>
         </div>

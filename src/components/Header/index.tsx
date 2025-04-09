@@ -23,17 +23,15 @@ const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Check and set user on component mount and when path changes
   useEffect(() => {
-    // Check if the user is stored in localStorage
+
     const storedUser = localStorage.getItem('Leon_user') || localStorage.getItem('Farm_user');
     
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Parse and set the user data
+      setUser(JSON.parse(storedUser));
     }
   }, [pathname]);
 
-  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('Leon_user');
     localStorage.removeItem('Farm_user');
@@ -42,18 +40,32 @@ const Header = () => {
     router.push('/signin');
   };
 
-  // Google Translate initialization (same as before)
   useEffect(() => {
     if (typeof window !== "undefined" && document) {
-      // ... (keep your existing google translate implementation)
+
+      window.googleTranslateElementInit = () => {
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: 'en',
+            includedLanguages: 'en,fr,sw', 
+            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
+          },
+          'google_translate_element'
+        );
+      };
+
+      const script = document.createElement("script");
+      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.async = true;
+      document.body.appendChild(script);
+
+      const browserLanguage = navigator.language.split("-")[0]; 
+      setSelectedLanguage(browserLanguage);
+      changeLanguage(browserLanguage); 
     }
   }, []);
 
-  function navbarToggleHandler(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    setNavbarOpen((prev) => !prev);
-  }
-
-  function changeLanguage(value: string): void {
+  const changeLanguage = (value: string): void => {
     setSelectedLanguage(value);
     if (typeof window !== "undefined" && window.google && window.google.translate) {
       const translateElement = document.querySelector(".goog-te-combo") as HTMLSelectElement;
@@ -62,15 +74,18 @@ const Header = () => {
         translateElement.dispatchEvent(new Event("change"));
       }
     }
+  };
+
+  function navbarToggleHandler(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    setNavbarOpen((prev) => !prev);
   }
 
   return (
     <header
-      className={`header left-0 top-0 z-40 flex w-full items-center ${
-        navbarOpen
-          ? "dark:bg-gray-dark dark:shadow-sticky-dark fixed z-[9999] bg-white !bg-opacity-80 shadow-sticky backdrop-blur-sm transition"
-          : "absolute bg-transparent"
-      }`}
+      className={`header left-0 top-0 z-40 flex w-full items-center ${navbarOpen
+        ? "dark:bg-gray-dark dark:shadow-sticky-dark fixed z-[9999] bg-white !bg-opacity-80 shadow-sticky backdrop-blur-sm transition"
+        : "absolute bg-transparent"
+        }`}
     >
       <div className="container">
         <div className="relative -mx-4 flex items-center justify-between h-20">
@@ -106,9 +121,7 @@ const Header = () => {
               <nav
                 id="navbarCollapse"
                 className={`navbar absolute right-0 z-30 w-[250px] rounded border-[.5px] border-body-color/50 bg-white px-6 py-4 duration-300 dark:border-body-color/20 dark:bg-dark lg:visible lg:static lg:w-auto lg:border-none lg:!bg-transparent lg:p-0 lg:opacity-100 ${
-                  navbarOpen
-                    ? "visibility top-full opacity-100"
-                    : "invisible top-[120%] opacity-0"
+                  navbarOpen ? "visibility top-full opacity-100" : "invisible top-[120%] opacity-0"
                 }`}
               >
                 <ul className="block lg:flex lg:space-x-12">
@@ -138,15 +151,18 @@ const Header = () => {
 
             <div className="flex items-center gap-4">
               {/* Language Selector */}
-              <select
-                onChange={(e) => changeLanguage(e.target.value)}
+                <select
+                onChange={(e) => {
+                  const selectedLang = e.target.value;
+                  changeLanguage(selectedLang);
+                }}
                 value={selectedLanguage}
                 className="border-stroke rounded-lg border bg-[#f8f8f8] px-4 py-2 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-              >
+                >
                 <option value="en">English</option>
                 <option value="fr">Français</option>
                 <option value="sw">Swahili</option>
-              </select>
+                </select>
 
               {/* User Profile or Sign In */}
               {user ? (
@@ -154,7 +170,7 @@ const Header = () => {
                   <div className="flex items-center cursor-pointer" onClick={() => setShowDropdown(!showDropdown)}>
                     <Image
                       src={user.profilePicture || "/images/profile.png"}
-                      alt=" Profile"  
+                      alt=" Profile"
                       width={40}
                       height={40}
                       className="rounded-full"
