@@ -30,7 +30,7 @@ const JobDetailPage = () => {
 
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, []);
 
   const job = jobs.find((job) => job._id === id);
 
