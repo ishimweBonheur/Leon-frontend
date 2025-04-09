@@ -11,22 +11,17 @@ declare global {
 const GoogleTranslate = () => {
   useEffect(() => {
     if (typeof window !== "undefined" && document) {
-
       window.googleTranslateElementInit = () => {
         if (window.google && window.google.translate) {
-          const browserLanguage = navigator.language;
-          const defaultLanguage = browserLanguage.split("-")[0]; 
-
           new window.google.translate.TranslateElement(
             {
-              pageLanguage: defaultLanguage,
-              includedLanguages: "en,fr",
-              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE, 
+              pageLanguage: "fr", // Set French as the default language
+              includedLanguages: "en,fr", // Include English and French
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
               autoDisplay: false,
             },
             "google_translate_element"
           );
-          
 
           const translateElement = document.getElementById("google_translate_element");
           const iframe = translateElement?.querySelector("iframe");
