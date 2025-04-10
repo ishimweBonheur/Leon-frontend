@@ -15,7 +15,7 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("theme");
+    const storedUser = localStorage.getItem("leon_user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
