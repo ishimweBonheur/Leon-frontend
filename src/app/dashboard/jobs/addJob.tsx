@@ -24,7 +24,14 @@ type AddJobProps = {
   refetch: () => void;
 };
 
-const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetch }: AddJobProps) => {
+const AddJob = ({
+  isModalOpen,
+  closeModal,
+  editingJob,
+  addJob,
+  updateJob,
+  refetch,
+}: AddJobProps) => {
   const { deleteJob, loading, error } = useJobs();
 
   const [jobDetails, setJobDetails] = useState<Job>({
@@ -55,7 +62,11 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
     }
   }, [editingJob]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setJobDetails((prev) => ({
       ...prev,
@@ -87,9 +98,9 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
   if (!isModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-lg mx-4">
-        <h2 className="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-4">
+      <div className="bg-white dark:bg-gray-900 w-full max-w-lg md:max-w-xl lg:max-w-2xl mx-auto p-6 rounded-lg overflow-y-auto max-h-[95vh]">
+        <h2 className="text-xl font-bold mb-6 text-center text-gray-800 dark:text-white">
           {editingJob ? "Edit Job" : "Add New Job"}
         </h2>
 
@@ -120,15 +131,16 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
             onChange={handleChange}
             placeholder="Job Description"
             required
-            className="w-full px-4 py-2 border rounded-md dark:bg-gray-800 dark:text-white"
+            rows={4}
+            className="w-full px-4 py-2 border rounded-md dark:bg-gray-800 dark:text-white resize-none"
           />
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <select
               name="type"
               value={jobDetails.type}
               onChange={handleChange}
-              className="w-1/2 px-4 py-2 border rounded-md dark:bg-gray-800 dark:text-white"
+              className="w-full sm:w-1/2 px-4 py-2 border rounded-md dark:bg-gray-800 dark:text-white"
             >
               <option value="Remote">Remote</option>
               <option value="Onsite">Onsite</option>
@@ -138,7 +150,7 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
               name="experience"
               value={jobDetails.experience}
               onChange={handleChange}
-              className="w-1/2 px-4 py-2 border rounded-md dark:bg-gray-800 dark:text-white"
+              className="w-full sm:w-1/2 px-4 py-2 border rounded-md dark:bg-gray-800 dark:text-white"
             >
               <option value="Junior">Junior</option>
               <option value="Mid">Mid</option>
@@ -158,7 +170,7 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
           >
             {loading ? "Processing..." : editingJob ? "Update Job" : "Add Job"}
           </button>
@@ -168,7 +180,7 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
           <button
             onClick={handleDelete}
             disabled={loading}
-            className="w-full mt-2 bg-red-600 text-white py-2 rounded hover:bg-red-700"
+            className="w-full mt-3 bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-200"
           >
             {loading ? "Deleting..." : "Delete Job"}
           </button>
@@ -178,7 +190,7 @@ const AddJob = ({ isModalOpen, closeModal, editingJob, addJob, updateJob, refetc
 
         <button
           onClick={closeModal}
-          className="w-full mt-4 text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
+          className="w-full mt-4 text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white transition"
         >
           Cancel
         </button>
