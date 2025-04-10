@@ -7,23 +7,22 @@ declare global {
   }
 }
 
-const getBrowserLanguage = (): string => {
-  const lang = typeof navigator !== "undefined" ? navigator.language.toLowerCase() : "fr";
-  if (lang.startsWith("fr")) return "fr";
-  if (lang.startsWith("sw")) return "sw";
-  return "en";
+const getCurrentLanguage = () => {
+  // Only run on client side
+  if (typeof document === 'undefined') return 'en';
+  
+  const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
+  return match ? match[1] : "en";
 };
 
 const LanguageSelector = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("fr"); // default value
+  const [selectedLanguage, setSelectedLanguage] = useState("en"); // Default to 'en'
 
   useEffect(() => {
-    const getCurrentLanguage = () => {
-      const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
-      return match ? match[1] : "fr";
-    };
-
+    // Initialize with the actual language only on client side
+    setSelectedLanguage(getCurrentLanguage());
+    
     const removeBanner = () => {
       document
         .querySelectorAll(".goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame")
@@ -39,7 +38,7 @@ const LanguageSelector = () => {
     window.googleTranslateElementInit = () => {
       new window.google.translate.TranslateElement(
         {
-          pageLanguage: "fr",
+          pageLanguage: "en",
           includedLanguages: "en,fr,sw",
           autoDisplay: false,
           layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
@@ -73,20 +72,6 @@ const LanguageSelector = () => {
     document.head.appendChild(style);
 
     const interval = setInterval(removeBanner, 1000);
-
-    // Set current language after mounting
-    const currentLang = getCurrentLanguage();
-    setSelectedLanguage(currentLang);
-
-    // Auto-detect and apply browser language
-    const browserLang = getBrowserLanguage();
-    if (browserLang !== currentLang) {
-      document.cookie = `googtrans=/fr/${browserLang}; path=/; domain=.${window.location.hostname}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
-      setSelectedLanguage(browserLang);
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    }
 
     return () => {
       clearInterval(interval);
