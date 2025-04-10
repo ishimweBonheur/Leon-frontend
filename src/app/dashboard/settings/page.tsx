@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react';
-import { isLoggedIn } from '@/Hooks/useAuth'; // Adjust import path as needed
+import { isLoggedIn } from '@/Hooks/useAuth'; 
 
 const ProfilePage = () => {
   const currentUser = isLoggedIn() || {
@@ -34,7 +34,7 @@ const ProfilePage = () => {
   };
 
   const handleSave = (section: string) => {
-    // Here you would typically call an API to save the data
+    
     console.log(`Saving ${section} data:`, profileData);
     setEditSection(null);
   };
