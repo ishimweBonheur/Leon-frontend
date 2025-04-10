@@ -17,7 +17,7 @@ declare global {
 
 const Header = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("fr"); // Default to French
+  const [selectedLanguage, setSelectedLanguage] = useState("fr"); 
   const [user, setUser] = useState<any>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const pathname = usePathname();

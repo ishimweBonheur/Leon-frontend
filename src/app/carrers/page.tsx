@@ -28,8 +28,6 @@ const HomePage = () => {
     (currentPage - 1) * jobsPerPage,
     currentPage * jobsPerPage
   );
-
-  if (loading) return <p>Loading jobs...</p>;
   if (error) return <p>{error}</p>;
 
   return (

@@ -17,8 +17,6 @@ refetch()
 }, [])
 const job = jobs.find((job) => job._id === id);
 
-
-  if (loading) return <p className="text-center py-10">Loading job details...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error.message || "Error loading job."}</p>;
 
   return (

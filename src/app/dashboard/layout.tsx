@@ -60,14 +60,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
 
         {/* Header */}
-        <header className="h-16 bg-gray-900 dark:bg-gray-900 text-white shadow-md flex items-center justify-between px-4 fixed w-full z-40">
+        <header className="h-16 bg-white dark:bg-gray-900 text-black dark:text-white shadow-md flex items-center justify-between px-4 fixed w-full z-40">
           <button className="md:hidden" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             ☰
           </button>
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <LanguageSelector />
           <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full mr-64">
-            {darkMode ? <SunIcon className="h-6 w-6 text-yellow-400" /> : <MoonIcon className="h-6 w-6 text-gray-200" />}
+            {darkMode ? <SunIcon className="h-6 w-6 text-yellow-400" /> : <MoonIcon className="h-6 w-6 text-black" />}
           </button>
         </header>
 

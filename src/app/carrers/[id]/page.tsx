@@ -73,18 +73,8 @@ const JobDetailPage = () => {
       console.error("Application failed:", err);
     }
   };
-
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center">Loading job details...</div>
-    );
   if (error)
     return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error.message}</div>;
-  if (!id)
-    return <div className="min-h-screen flex items-center justify-center">No job ID specified in URL</div>;
-  if (!job && !loading)
-    return <div className="min-h-screen flex items-center justify-center">Job not found</div>;
-
   return (
     <>
       {/* MODAL OVERLAY */}
