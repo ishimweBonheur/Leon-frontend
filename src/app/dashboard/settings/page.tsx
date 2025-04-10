@@ -15,7 +15,7 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("leon_user");
+    const storedUser = localStorage.getItem("Leon_user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -48,7 +48,7 @@ const ProfilePage = () => {
   ) => {
     return editSection === section ? (
       <div className="mb-4">
-        <label className="block text-sm font-medium dark:text-gray-500 text-black  mb-1">{label}</label>
+        <label className="block text-sm font-medium   mb-1">{label}</label>
         <input
           type="text"
           name={name}
@@ -60,7 +60,7 @@ const ProfilePage = () => {
     ) : (
       <div className="mb-4">
         <p className="text-sm dark:text-gray-500 text-black">{label}</p>
-        <p className="dark:text-gray-900 text-black-400">{value || "-"}</p>
+        <p className="dark:text-white text-black ">{value || "-"}</p>
       </div>
     );
   };
@@ -86,7 +86,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <div className="p-6 dark:bg-gray-900 bg-white">
+        <div className="p-6 dark:bg-gray-900 bg-white text-black dark:text-white">
 
           <div className="mb-8 border-b pb-6 ">
             <div className="flex justify-between items-center mb-4">
@@ -101,7 +101,7 @@ const ProfilePage = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
               {renderEditableField("First Name", "firstName", user.firstName, "personal") }
               {renderEditableField("Last Name", "lastName", user.lastName, "personal")}
               {renderEditableField("Username", "username", user.username, "personal")}

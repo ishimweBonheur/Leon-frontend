@@ -94,9 +94,7 @@ const HomePage = () => {
                 <div className="col-span-1 flex flex-col justify-between items-start gap-3">
                   <Link
                     href={`/carrers/${job._id}`}
-                    className={`px-4 py-2 w-1/2  text-center rounded-full text-sm font-medium ${job.status === "Available"
-                        ? "bg-black text-white"
-                        : "bg-gray-300 text-gray-500 "
+                    className={`px-4 py-2 w-1/2  text-center rounded-full text-sm font-medium bg-gray-200 text-blue-500 hover:text-blue-900 md:bg-transparent"
                       }`}
                   >
                     View
