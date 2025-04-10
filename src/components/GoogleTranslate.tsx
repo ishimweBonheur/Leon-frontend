@@ -7,13 +7,8 @@ declare global {
   }
 }
 
-const getCurrentLanguage = () => {
-  const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
-  return match ? match[1] : "en";
-};
-
 const getBrowserLanguage = (): string => {
-  const lang = navigator.language.toLowerCase();
+  const lang = typeof navigator !== "undefined" ? navigator.language.toLowerCase() : "fr";
   if (lang.startsWith("fr")) return "fr";
   if (lang.startsWith("sw")) return "sw";
   return "en";
@@ -21,9 +16,14 @@ const getBrowserLanguage = (): string => {
 
 const LanguageSelector = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(getCurrentLanguage());
+  const [selectedLanguage, setSelectedLanguage] = useState("fr"); // default value
 
   useEffect(() => {
+    const getCurrentLanguage = () => {
+      const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
+      return match ? match[1] : "fr";
+    };
+
     const removeBanner = () => {
       document
         .querySelectorAll(".goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame")
@@ -39,7 +39,7 @@ const LanguageSelector = () => {
     window.googleTranslateElementInit = () => {
       new window.google.translate.TranslateElement(
         {
-          pageLanguage: "en",
+          pageLanguage: "fr",
           includedLanguages: "en,fr,sw",
           autoDisplay: false,
           layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
@@ -74,11 +74,14 @@ const LanguageSelector = () => {
 
     const interval = setInterval(removeBanner, 1000);
 
+    // Set current language after mounting
+    const currentLang = getCurrentLanguage();
+    setSelectedLanguage(currentLang);
+
     // Auto-detect and apply browser language
     const browserLang = getBrowserLanguage();
-    const currentLang = getCurrentLanguage();
     if (browserLang !== currentLang) {
-      document.cookie = `googtrans=/en/${browserLang}; path=/; domain=.${window.location.hostname}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+      document.cookie = `googtrans=/fr/${browserLang}; path=/; domain=.${window.location.hostname}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
       setSelectedLanguage(browserLang);
       setTimeout(() => {
         window.location.reload();
