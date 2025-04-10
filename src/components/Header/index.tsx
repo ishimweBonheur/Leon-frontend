@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
 import { useRouter } from "next/navigation";
+import LanguageSelector from "../GoogleTranslate";
 
 declare global {
   interface Window {
@@ -37,40 +38,7 @@ const Header = () => {
     router.push("/signin");
   };
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && document) {
-      window.googleTranslateElementInit = () => {
-        console.log("Initializing Google Translate"); // Debug log
-        new window.google.translate.TranslateElement(
-          {
-            pageLanguage: "fr", // Set French as the default language
-            includedLanguages: "en,fr,sw", // Include English, French, and Swahili
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          },
-          "google_translate_element"
-        );
-      };
-
-      if (!document.querySelector("script[src*='translate.google.com']")) {
-        const script = document.createElement("script");
-        script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-        script.async = true;
-        document.body.appendChild(script);
-        console.log("Google Translate script added"); // Debug log
-      }
-    }
-  }, []);
-
-  const changeLanguage = (value: string): void => {
-    setSelectedLanguage(value);
-    if (typeof window !== "undefined" && window.google && window.google.translate) {
-      const translateElement = document.querySelector(".goog-te-combo") as HTMLSelectElement;
-      if (translateElement) {
-        translateElement.value = value;
-        translateElement.dispatchEvent(new Event("change"));
-      }
-    }
-  };
+ 
 
   const navbarToggleHandler = () => {
     setNavbarOpen((prev) => !prev);
@@ -163,21 +131,8 @@ const Header = () => {
             </nav>
 
             <div className="flex items-center gap-4">
-              {/* Language Selector */}
-              <select
-                onChange={(e) => {
-                  const selectedLang = e.target.value;
-                  changeLanguage(selectedLang);
-                }}
-                value={selectedLanguage}
-                className="border-stroke rounded-lg border bg-[#f8f8f8] px-4 py-2 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-              >
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="sw">Swahili</option>
-              </select>
+             
 
-              {/* User Profile or Sign In */}
               {user ? (
                 <div className="relative">
                   <div
@@ -229,6 +184,7 @@ const Header = () => {
                 </Link>
               )}
 
+<LanguageSelector/>
               <ThemeToggler />
             </div>
           </div>

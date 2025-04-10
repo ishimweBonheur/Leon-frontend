@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 
 import { Menu, BarChart, Users, Briefcase, Settings } from "lucide-react";
+import LanguageSelector from "@/components/GoogleTranslate";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -30,9 +31,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`w-64 h-full bg-white dark:bg-gray-900 shadow-xl text-black dark:text-white p-5 space-y-4 fixed z-50 ${
-          isSidebarOpen ? "block" : "hidden"
-        } md:block`}
+        className={`w-64 h-full bg-white dark:bg-gray-900 shadow-xl text-black dark:text-white p-5 space-y-4 fixed z-50 ${isSidebarOpen ? "block" : "hidden"
+          } md:block`}
       >
         <h2 className="text-xl font-bold text-black dark:text-white">Admin Panel</h2>
         <nav className="space-y-4">
@@ -54,14 +54,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col ml-64">
+      {/* Main Content */}<div
+        className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "ml-64" : "ml-0 md:ml-64"
+          }`}
+      >
+
         {/* Header */}
         <header className="h-16 bg-gray-900 dark:bg-gray-900 text-white shadow-md flex items-center justify-between px-4 fixed w-full z-40">
           <button className="md:hidden" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             ☰
           </button>
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
+          <LanguageSelector />
           <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full mr-64">
             {darkMode ? <SunIcon className="h-6 w-6 text-yellow-400" /> : <MoonIcon className="h-6 w-6 text-gray-200" />}
           </button>
