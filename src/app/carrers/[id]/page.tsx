@@ -75,6 +75,10 @@ const JobDetailPage = () => {
   };
   if (error)
     return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error.message}</div>;
+
+  if (loading || !job)
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading...</div>;
+
   return (
     <>
       {/* MODAL OVERLAY */}
