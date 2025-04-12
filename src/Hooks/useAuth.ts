@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { api, queryString } from './api';
 import { storage } from '@/utils/storage';
 import { jwtDecode } from 'jwt-decode'
+import { Route } from 'lucide-react';
 
 
 
@@ -53,11 +54,11 @@ export const isLoggedIn = () => {
 
         if (decodedToken.exp < currentTime) {
             storage.removeToken();
-            localStorage.removeItem('Farm_user');
+            localStorage.removeItem('Leon_user');
             return false;
         }
 
-        const user = localStorage.getItem('Farm_user');
+        const user = localStorage.getItem('Leon_user');
         if (user) {
             return JSON.parse(user);
         }
@@ -87,6 +88,7 @@ export const useUsers = () => {
             await api.post('/auth/register', user);
             fetchUsers();
             toast.success('User Created successfully');
+  
         } catch (error: any) {
             handleUserError(error);
         } finally {

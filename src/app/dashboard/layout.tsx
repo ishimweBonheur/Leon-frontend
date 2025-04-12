@@ -10,27 +10,22 @@ import {
   Briefcase,
   Settings,
   X,
+
+  
 } from "lucide-react";
 import LanguageSelector from "@/components/GoogleTranslate";
- 
-
-
-
+import { isLoggedIn } from "@/Hooks/useAuth";
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const userRole = "admin";
+  const user = isLoggedIn(); 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    if (!userRole) {
-      router.push("/");
+    if (!user || user.role !== "admin") {
+      router.push("/"); 
     }
-  }, [userRole, router]);
-  if(!userRole) {
-    return null;
-    
-  }
+  }, [user, router]);  
 
   useEffect(() => {
     if (darkMode) {
@@ -39,6 +34,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
+  console.log(user)
+
+  if (!user || user.role !== "admin") {
+    return null; 
+  }
 
   return (
     <div className="flex h-screen overflow-hidden   

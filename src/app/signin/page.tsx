@@ -24,7 +24,7 @@ const SigninPage = () => {
     if (response) {
       toast.success("Login successful!");
       if (response.user.Role === "admin") {
-        router.push("/dashboard");
+        router.push("/");
       }
       else {
         router.push("/");

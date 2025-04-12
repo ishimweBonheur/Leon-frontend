@@ -35,6 +35,7 @@ const SignupPage = () => {
     try {
     const response:any =   await addUser(formData);
       storage.setToken(response?.token);
+      router.push("/");
 
     } catch (error) {
  
