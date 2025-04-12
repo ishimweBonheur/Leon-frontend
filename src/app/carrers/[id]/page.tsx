@@ -4,6 +4,24 @@ import { useJobs } from "@/Hooks/jobs";
 import Link from "next/link";
 import { useJobApplication } from "@/Hooks/applications";
 import { useParams } from "next/navigation";
+import toast from "react-hot-toast";
+
+interface Job {
+  _id: string;
+  title: string;
+  location: string;
+  type: string;
+  experience: string;
+  status: string;
+  endDate: string;
+  salary?: number;
+  applicationsCount?: number;
+  description: string;
+}
+
+interface JobDetailProps {
+  job: Job;
+}
 
 const JobDetailPage = () => {
   const params = useParams();
@@ -33,6 +51,8 @@ const JobDetailPage = () => {
   }, []);
 
   const job = jobs.find((job) => job._id === id);
+
+  const daysLeft = job ? Math.max(0, Math.ceil((new Date(job.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,11 +88,13 @@ const JobDetailPage = () => {
         linkedInProfile: "",
         additionalInfo: "",
       });
+      toast.success("Application submitted successfully!")
       setShowModal(false);
     } catch (err) {
-      console.error("Application failed:", err);
+      toast.error("Application failed:", err);
     }
   };
+
   if (error)
     return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error.message}</div>;
 
@@ -208,7 +230,7 @@ const JobDetailPage = () => {
               </div>
 
               <div className="flex justify-center">
-              <button
+                <button
                   type="submit"
                   disabled={applicationLoading}
                   className={`px-6 py-3 rounded-lg text-white font-semibold transition ${
@@ -228,14 +250,11 @@ const JobDetailPage = () => {
       {/* JOB DETAIL CONTENT */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-
           <div className="bg-white dark:bg-[#1E293B] rounded-xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
             <div className="bg-gradient-to-r from-blue-600 to-emerald-500 p-6 text-white">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-                    {job.title}
-                  </h1>
+                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{job.title}</h1>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className="flex items-center text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
                       📍 {job.location}
@@ -250,33 +269,37 @@ const JobDetailPage = () => {
                 </div>
 
                 {/* Status Badge with Pulse Animation */}
-                <div className={`px-4 py-2 rounded-full font-semibold text-sm flex items-center ${job.status === "Available"
-                  ? "bg-white text-emerald-600 animate-pulse"
-                  : "bg-gray-800 text-gray-300"
-                  }`}>
-                    <>
-                      <span className="relative flex h-2 w-2 mr-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                      </span>
-                      {job.remainingDays} days left to apply
-                    </>
-            
+                <div
+                  className={`px-4 py-2 rounded-full font-semibold text-sm flex items-center ${
+                    job.status === 'Available' ? 'bg-white text-emerald-600 animate-pulse' : 'bg-gray-800 text-gray-300'
+                  }`}
+                >
+                  <span className="relative flex h-2 w-2 mr-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  {daysLeft} days left to apply
                 </div>
               </div>
             </div>
+
             <div className="p-8">
               <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 dark:bg-[#334155] p-4 rounded-lg">
                 {job.salary && (
                   <div className="flex items-center">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full mr-3">
                       <svg className="w-5 h-5 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Salary</p>
-                      <p className="font-medium">{job.salary}</p>
+                      <p className="font-medium">${job.salary.toLocaleString()}</p>
                     </div>
                   </div>
                 )}
@@ -289,7 +312,7 @@ const JobDetailPage = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Posted</p>
-                    <p className="font-medium">{new Date(job.postedDate).toLocaleDateString()}</p>
+                    <p className="font-medium">{new Date(job.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
 
@@ -301,10 +324,11 @@ const JobDetailPage = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Applications</p>
-                    <p className="font-medium">{job.applicationsCount || "Open"}</p>
+                    <p className="font-medium">{job.status || 'Open'}</p>
                   </div>
                 </div>
               </div>
+
               <div className="mb-8">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                   <span className="w-1 h-6 bg-blue-500 mr-2 rounded-full"></span>
@@ -318,8 +342,6 @@ const JobDetailPage = () => {
                   ))}
                 </div>
               </div>
-
-
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">

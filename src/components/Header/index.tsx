@@ -17,7 +17,7 @@ declare global {
 
 const Header = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("fr"); 
+  const [selectedLanguage, setSelectedLanguage] = useState("fr");
   const [user, setUser] = useState<any>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const pathname = usePathname();
@@ -38,7 +38,7 @@ const Header = () => {
     router.push("/signin");
   };
 
- 
+
 
   const navbarToggleHandler = () => {
     setNavbarOpen((prev) => !prev);
@@ -46,11 +46,10 @@ const Header = () => {
 
   return (
     <header
-      className={`header left-0 top-0 z-40 flex w-full items-center ${
-        navbarOpen
+      className={`header left-0 top-0 z-40 flex w-full items-center ${navbarOpen
           ? "dark:bg-gray-dark dark:shadow-sticky-dark fixed z-[9999] bg-white !bg-opacity-80 shadow-sticky backdrop-blur-sm transition"
           : "absolute bg-transparent"
-      }`}
+        }`}
     >
       <div className="container">
         <div className="relative -mx-4 flex items-center justify-between h-20">
@@ -102,9 +101,8 @@ const Header = () => {
             </div>
             <nav
               id="navbarCollapse"
-              className={`navbar absolute right-0 z-30 w-[250px] rounded border-[.5px] border-body-color/50 bg-white px-6 py-4 duration-300 dark:border-body-color/20 dark:bg-dark lg:visible lg:static lg:w-auto lg:border-none lg:!bg-transparent lg:p-0 lg:opacity-100 ${
-                navbarOpen ? "visible top-full opacity-100" : "invisible top-[120%] opacity-0"
-              }`}
+              className={`navbar absolute right-0 z-30 w-[250px] rounded border-[.5px] border-body-color/50 bg-white px-6 py-4 duration-300 dark:border-body-color/20 dark:bg-dark lg:visible lg:static lg:w-auto lg:border-none lg:!bg-transparent lg:p-0 lg:opacity-100 ${navbarOpen ? "visible top-full opacity-100" : "invisible top-[120%] opacity-0"
+                }`}
             >
               <ul className="block lg:flex lg:space-x-12">
                 {menuData.map((menuItem, index) => (
@@ -112,11 +110,10 @@ const Header = () => {
                     {menuItem.path ? (
                       <Link
                         href={menuItem.path}
-                        className={`flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 ${
-                          pathname === menuItem.path
+                        className={`flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 ${pathname === menuItem.path
                             ? "text-primary dark:text-white"
                             : "text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
-                        }`}
+                          }`}
                       >
                         {menuItem.title}
                       </Link>
@@ -131,7 +128,7 @@ const Header = () => {
             </nav>
 
             <div className="flex items-center gap-4">
-             
+
 
               {user ? (
                 <div className="relative">
@@ -159,13 +156,7 @@ const Header = () => {
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
                       </div>
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        My Profile
-                      </Link>
+
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -184,7 +175,7 @@ const Header = () => {
                 </Link>
               )}
 
-<LanguageSelector/>
+              <LanguageSelector />
               <ThemeToggler />
             </div>
           </div>

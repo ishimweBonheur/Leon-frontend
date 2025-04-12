@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
-import { api } from "./api";
+import toast from "react-hot-toast";
+import { api, queryString } from "./api";
 
-// ✅ Correctly structured interface based on your UI usage
 interface JobApplication {
   _id: string;
   user: {
@@ -22,26 +22,35 @@ interface JobApplication {
   status: string;
 }
 
-interface JobApplicationResponse {
-  message: string;
-}
-
 export const useJobApplication = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
-  const applyToJob = async (jobId: string, applicationData: Omit<JobApplication, "_id" | "job" | "user" | "status">) => {
+  const fetchApplications = async () => {
     setLoading(true);
-    setError(null);
-
     try {
-      const response = await api.post<JobApplicationResponse>(
-        `/applications/${jobId}/apply`,
-        applicationData
-      );
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred while applying.");
+      const response = await api.get(`/applications${queryString()}`);
+      setApplications(response.data);
+    } catch (error: any) {
+      handleApplicationError(error, "fetching applications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyToJob = async (
+    jobId: string,
+    applicationData: Omit<JobApplication, "_id" | "job" | "user" | "status">
+  ) => {
+    setLoading(true);
+    try {
+      await api.post(`/applications/${jobId}/apply`, applicationData);
+      toast.success("Application submitted successfully");
+      fetchApplications();
+    } catch (error: any) {
+      handleApplicationError(error, "submitting application");
     } finally {
       setLoading(false);
     }
@@ -49,35 +58,36 @@ export const useJobApplication = () => {
 
   const updateApplicationStatus = async (applicationId: string, status: string) => {
     setLoading(true);
-    setError(null);
-
     try {
-      const response = await axios.patch<JobApplicationResponse>(
-        `/api/jobApplications/${applicationId}/status`,
-        { status }
-      );
-
-      if (response.status === 200) {
-        alert(response.data.message);
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred while updating the status.");
+      const response = await axios.patch(`/api/jobApplications/${applicationId}/status`, { status });
+      toast.success(response.data.message || "Application status updated");
+      fetchApplications();
+    } catch (error: any) {
+      handleApplicationError(error, "updating application status");
     } finally {
       setLoading(false);
     }
   };
+  const getAllApplications = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/applications");
+      setApplications(response.data);
+    } catch (error: any) {
+      handleApplicationError(error, "fetching all applications");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   const getApplicationsByJob = async (jobId: string) => {
     setLoading(true);
-    setError(null);
-
     try {
-      const response = await axios.get<JobApplication[]>(`/api/jobApplications/by-job/${jobId}`);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred while retrieving applications.");
+      const response = await axios.get(`/api/jobApplications/by-job/${jobId}`);
+      return response.data;
+    } catch (error: any) {
+      handleApplicationError(error, "retrieving applications by job");
     } finally {
       setLoading(false);
     }
@@ -85,15 +95,11 @@ export const useJobApplication = () => {
 
   const getApplicationsByUser = async (userId: string) => {
     setLoading(true);
-    setError(null);
-
     try {
-      const response = await axios.get<JobApplication[]>(`/api/jobApplications/by-user/${userId}`);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred while retrieving user applications.");
+      const response = await axios.get(`/api/jobApplications/by-user/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      handleApplicationError(error, "retrieving user applications");
     } finally {
       setLoading(false);
     }
@@ -101,18 +107,11 @@ export const useJobApplication = () => {
 
   const getApplicationsByStatus = async (status: string) => {
     setLoading(true);
-    setError(null);
-
     try {
-      const response = await axios.get<JobApplication[]>(
-        `/api/jobApplications/by-status/${status}`
-      );
-
-      if (response.status === 200) {
-        return response.data; 
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.error || "An error occurred while retrieving applications by status.");
+      const response = await axios.get(`/api/applications/status/${status}`);
+      return response.data;
+    } catch (error: any) {
+      handleApplicationError(error, "retrieving applications by status");
     } finally {
       setLoading(false);
     }
@@ -120,37 +119,51 @@ export const useJobApplication = () => {
 
   const uploadFile = async (file: File): Promise<string> => {
     setLoading(true);
-    setError(null);
-
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+    formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
 
     try {
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload`,
         formData
       );
       const url = response.data.secure_url;
       setFileUrl(url);
+      toast.success("File uploaded successfully");
       return url;
-    } catch (err) {
-      setError("Failed to upload file");
-      throw err;
+    } catch (error) {
+      toast.error("Failed to upload file");
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
+  const handleApplicationError = (error: any, action: string) => {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      `An error occurred while ${action}.`;
+  
+    toast.error(message);  
+  
+    setError(message); 
+  };
+  
+
   return {
+    applications,
+    loading,
+    error,
+    fileUrl,
+    refetch: fetchApplications,
     applyToJob,
     updateApplicationStatus,
     getApplicationsByJob,
     getApplicationsByUser,
     getApplicationsByStatus,
+    getAllApplications,
     uploadFile,
-    fileUrl,
-    loading,
-    error,
   };
 };
