@@ -7,7 +7,8 @@ interface JobApplication {
   _id: string;
   user: {
     _id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
   };
   job: {
@@ -57,17 +58,21 @@ export const useJobApplication = () => {
   };
 
   const updateApplicationStatus = async (applicationId: string, status: string) => {
+    console.log("Updating", applicationId, "to status", status); // 🧪 Add this
     setLoading(true);
-    try {
-      const response = await axios.patch(`/api/jobApplications/${applicationId}/status`, { status });
-      toast.success(response.data.message || "Application status updated");
+    try 
+    {await api.patch(`/applications/${applicationId}/status`, { status });
       fetchApplications();
+      
+
+      toast.success("Application status updated successfully");
     } catch (error: any) {
       handleApplicationError(error, "updating application status");
     } finally {
       setLoading(false);
     }
   };
+
   const getAllApplications = async () => {
     setLoading(true);
     try {
@@ -79,12 +84,11 @@ export const useJobApplication = () => {
       setLoading(false);
     }
   };
-  
 
   const getApplicationsByJob = async (jobId: string) => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/jobApplications/by-job/${jobId}`);
+      const response = await axios.get(`/api/applications/by-job/${jobId}`);
       return response.data;
     } catch (error: any) {
       handleApplicationError(error, "retrieving applications by job");
@@ -145,12 +149,9 @@ export const useJobApplication = () => {
       error.response?.data?.message ||
       error.response?.data?.error ||
       `An error occurred while ${action}.`;
-  
-    toast.error(message);  
-  
-    setError(message); 
+    setError(message);
+    console.error(`Error while ${action}:`, error); // Added logging for debugging
   };
-  
 
   return {
     applications,

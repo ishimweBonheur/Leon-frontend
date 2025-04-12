@@ -117,15 +117,7 @@ const SigninPage = () => {
           </div>
         </div>
         <div className="absolute right-0 top-0 z-[-1] opacity-30 lg:opacity-100">
-          <svg
-            width="450"
-            height="556"
-            viewBox="0 0 450 556"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* SVG code for design */}
-          </svg>
+      
         </div>
       </div>
     </section>

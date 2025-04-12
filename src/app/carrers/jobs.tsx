@@ -7,7 +7,7 @@ import { api } from "@/Hooks/api"; // Ensure this is correctly configured
 import { useJobs } from "@/Hooks/jobs";
 
 const JobDetail = () => {
-  const { id } = useParams(); // ✅ Correct for App Router
+  const { id } = useParams(); 
   const router = useRouter();
   const [error, setError] = useState<any>(null);
   const {jobs, loading,refetch} =  useJobs()

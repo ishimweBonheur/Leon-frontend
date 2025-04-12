@@ -131,9 +131,9 @@ const Widgets = () => {
 
   return (
     <section>
-      <div className="p-6 overflow-y-auto">
+      <div className="p-6 sm:mr-6 ">
 
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 ">
           <div className="flex space-x-2">
             <button
               className={`px-4 py-2 rounded-lg ${activeTab === 'overview' ? 'bg-primary dark:text-white text-white' : 'dark:text-black text-black bg-gray-200'}`}
@@ -149,8 +149,7 @@ const Widgets = () => {
             </button>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 px-4 sm:px-6 lg:px-8">
           <div className=" p-5 bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border-l-4 border-primary">
             <h3 className=" dark:text-gray-300 text-black text-sm font-medium">Total Jobs</h3>
             <p className="text-2xl font-bold dark:text-gray-300 text-black">{stats.totalJobs}</p>

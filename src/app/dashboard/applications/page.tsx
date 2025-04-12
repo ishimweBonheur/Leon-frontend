@@ -8,6 +8,7 @@ interface Application {
   user: {
     _id: string;
     firstName: string;
+    lastName: string;
     email: string;
   };
   job: {
@@ -28,16 +29,15 @@ export default function ManageApplicationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const applicationsPerPage = 4; 
   const totalPages = Math.ceil(applications.length / applicationsPerPage); 
-
+  const paginatedApplications = applications.slice(
+    (currentPage - 1) * applicationsPerPage,
+    currentPage * applicationsPerPage
+  );
 
   useEffect(() => {
-   
-
     getAllApplications();
   }, []);
 
-
-  
   return (
     <section className="py-16 px-2 sm:px-4">
       <div className="container mx-auto">
@@ -46,7 +46,7 @@ export default function ManageApplicationsPage() {
         </h2>
 
         {/* Responsive table wrapper */}
-        <div className="overflow-x-auto shadow-md rounded-lg dark:bg-gray-800 dark:text-white">
+        <div className="overflow-x-auto shadow-md rounded-lg dark:bg-gray-800 bg-white text-black dark:text-white">
           <table className="w-full min-w-[700px] border-collapse">
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
@@ -63,10 +63,10 @@ export default function ManageApplicationsPage() {
               </tr>
             </thead>
             <tbody>
-              {applications.length > 0 ? (
-                applications.map((app) => (
+              {paginatedApplications.length > 0 ? (
+                paginatedApplications.map((app) => (
                     <tr key={app._id} className="border-b dark:border-gray-600">
-                      <td className="py-3 px-4">{app.user.name}</td>
+                      <td className="py-3 px-4">{app.user.firstName} {app.user.lastName}</td>
                     <td className="py-3 px-4">{app.job.title}</td>
                     <td className="py-3 px-4">{app.user.email}</td>
                     <td className="py-3 px-4">
@@ -75,7 +75,7 @@ export default function ManageApplicationsPage() {
                         target="_blank"
                         className="text-blue-600 hover:underline"
                       >
-                        View Resume
+                         Resume
                       </Link>
                     </td>
                     <td className="py-3 px-4">
@@ -84,7 +84,7 @@ export default function ManageApplicationsPage() {
                         target="_blank"
                         className="text-blue-600 hover:underline"
                       >
-                        View Cover Letter
+                        Cover Letter
                       </Link>
                     </td>
                     <td className="py-3 px-4">
@@ -93,7 +93,7 @@ export default function ManageApplicationsPage() {
                         target="_blank"
                         className="text-blue-600 hover:underline"
                       >
-                        View Portfolio
+                        Portfolio
                       </Link>
                     </td>
                     <td className="py-3 px-4">
@@ -102,7 +102,7 @@ export default function ManageApplicationsPage() {
                         target="_blank"
                         className="text-blue-600 hover:underline"
                       >
-                        View GitHub
+                        GitHub
                       </Link>
                     </td>
                     <td className="py-3 px-4">
@@ -111,7 +111,7 @@ export default function ManageApplicationsPage() {
                         target="_blank"
                         className="text-blue-600 hover:underline"
                       >
-                        View LinkedIn
+                        LinkedIn
                       </Link>
                     </td>
                     <td
@@ -128,11 +128,13 @@ export default function ManageApplicationsPage() {
                     <td className="py-3 px-4">
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
+                        onClick={()=> updateApplicationStatus(app._id, "Accepted")}
                           className="bg-green-600 text-white px-3 py-1 rounded text-sm"
                         >
                           Approve
                         </button>
                         <button
+                          onClick={()=> updateApplicationStatus(app._id, "Rejected")}
                           className="bg-red-600 text-white px-3 py-1 rounded text-sm"
                         >
                           Reject

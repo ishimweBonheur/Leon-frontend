@@ -102,8 +102,8 @@ export default function JobsPage() {
   };
 
   return (
-    <section id="jobs">
-      <div className="container mx-auto">
+    <section id="jobs" className="" >
+      <div className=" mx-auto">
         <h2 className="text-3xl font-bold text-center mb-8 text-black dark:text-white">Manage Jobs</h2>
 
         {/* Search & Filters */}

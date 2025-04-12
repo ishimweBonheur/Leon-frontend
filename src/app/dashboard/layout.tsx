@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [darkMode]);
 
   return (
-    <div className="flex h-screen overflow-hidden  
+    <div className="flex h-screen overflow-hidden   
     ">
       {/* Sidebar */}
       <aside
@@ -100,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-auto mt-16  md:p-6">
+        <main className="flex-1 overflow-y-auto overflow-x-auto mt-16  md:p-6 pr-6">
           {children}
         </main>
       </div>

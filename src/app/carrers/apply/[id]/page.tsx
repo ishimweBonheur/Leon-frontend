@@ -26,11 +26,9 @@ const JobApplicationForm = () => {
     }
 
     try {
-      toast.loading("Uploading files...");
       const cvUrl = await uploadFile(cv);
       const coverLetterUrl = await uploadFile(coverLetter);
       toast.dismiss();
-      toast.success("Files uploaded successfully!");
 
       const applicationData = {
         jobId,
@@ -43,13 +41,9 @@ const JobApplicationForm = () => {
 
       console.log("Submitting job application...", applicationData);
 
-      // Example API call
-      // await axios.post(`/api/applications/${jobId}/apply`, applicationData);
 
-      toast.success("Application submitted successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to submit the application.");
     }
   };
 
