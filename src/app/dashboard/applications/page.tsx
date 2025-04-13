@@ -39,13 +39,13 @@ export default function ManageApplicationsPage() {
   }, []);
 
   return (
-    <section className="py-16 px-2 sm:px-4">
+    <section className="py-16 px-2 md:px-4">
       <div className="container mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-black dark:text-white">
           Manage Applications
         </h2>
 
-        {/* Responsive table wrapper */}
+    
         <div className="overflow-x-auto shadow-md rounded-lg dark:bg-gray-800 bg-white text-black dark:text-white">
           <table className="w-full min-w-[700px] border-collapse">
             <thead className="bg-gray-200 dark:bg-gray-700">

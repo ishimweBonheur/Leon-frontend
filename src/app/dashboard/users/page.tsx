@@ -104,9 +104,7 @@ export default function UsersPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="py-4 text-center text-gray-500">
-                  No users found.
-                </td>
+            
               </tr>
             )}
           </tbody>

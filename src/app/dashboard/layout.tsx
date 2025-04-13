@@ -10,11 +10,10 @@ import {
   Briefcase,
   Settings,
   X,
-
-  
 } from "lucide-react";
 import LanguageSelector from "@/components/GoogleTranslate";
 import { isLoggedIn } from "@/Hooks/useAuth";
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const user = isLoggedIn(); 
@@ -22,7 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    if (!user || user.role !== "admin") {
+    if (user.role !== "admin") {
       router.push("/"); 
     }
   }, [user, router]);  
@@ -34,73 +33,115 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
-  console.log(user)
 
-  if (!user || user.role !== "admin") {
-    return null; 
-  }
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (isSidebarOpen && window.innerWidth < 768) {
+        const sidebar = document.getElementById('sidebar');
+        const menuButton = document.getElementById('menu-button');
+        if (sidebar && !sidebar.contains(e.target as Node) && 
+            menuButton && !menuButton.contains(e.target as Node)) {
+          setIsSidebarOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
 
   return (
-    <div className="flex h-screen overflow-hidden   
-    ">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <aside
+        id="sidebar"
         className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 text-black dark:text-white shadow-lg transform transition-transform duration-300 z-50
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-        md:translate-x-0 md:static md:block`}
+        md:translate-x-0 md:relative`}
       >
-        <div className="flex items-center justify-between p-5 md:hidden">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold">Admin Panel</h2>
-          <button onClick={() => setIsSidebarOpen(false)}>
-            <X className="w-6 h-6" />
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="md:hidden p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="hidden md:block p-5">
-          <h2 className="text-xl font-bold">Admin Panel</h2>
-        </div>
-
-        <nav className="space-y-4 p-5">
-          <Link href="/dashboard" className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded">
-            <BarChart className="w-5 h-5 mr-2" /> Dashboard
+        <nav className="space-y-1 p-4 mt-2">
+          <Link href="/dashboard" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+            <BarChart className="w-5 h-5 mr-3" /> Dashboard
           </Link>
-          <Link href="/dashboard/jobs" className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded">
-            <Briefcase className="w-5 h-5 mr-2" /> Manage Jobs
+          <Link href="/dashboard/jobs" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+            <Briefcase className="w-5 h-5 mr-3" /> Manage Jobs
           </Link>
-          <Link href="/dashboard/users" className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded">
-            <Users className="w-5 h-5 mr-2" /> Users
+          <Link href="/dashboard/users" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+            <Users className="w-5 h-5 mr-3" /> Users
           </Link>
-          <Link href="/dashboard/applications" className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded">
-            <Users className="w-5 h-5 mr-2" /> Applications
+          <Link href="/dashboard/applications" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+            <Users className="w-5 h-5 mr-3" /> Applications
           </Link>
-          <Link href="/dashboard/settings" className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded">
-            <Settings className="w-5 h-5 mr-2" /> Settings
+          <Link href="/dashboard/settings" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+            <Settings className="w-5 h-5 mr-3" /> Settings
           </Link>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "ml-64" : ""}`}>
+      <div className="flex-1 flex flex-col overflow-hidden transition-all duration-300">
         {/* Header */}
-        <header className="h-16  text-black dark:text-white shadow-md flex items-center justify-between px-4 fixed top-0 left-0 w-full z-40 md:left-64 md:w-[calc(100%-16rem)]">
-          <button className="md:hidden" onClick={() => setIsSidebarOpen(true)}>
-            <Menu className="w-6 h-6" />
-          </button>
-          <h1 className="text-lg md:text-xl font-bold">Admin Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
-            <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full">
+        <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 h-16 text-black dark:text-white flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
+          <div className="flex items-center">
+            <button 
+              id="menu-button"
+              className="md:hidden p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 mr-2" 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h1 className="text-lg md:text-xl font-bold truncate">Admin Dashboard</h1>
+          </div>
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="hidden sm:block">
+              <LanguageSelector />
+            </div>
+            <button 
+              onClick={() => setDarkMode(!darkMode)} 
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
               {darkMode ? (
-                <SunIcon className="h-6 w-6 text-yellow-400" />
+                <SunIcon className="h-5 w-5 text-yellow-400" />
               ) : (
-                <MoonIcon className="h-6 w-6 text-black dark:text-white" />
+                <MoonIcon className="h-5 w-5 text-gray-700 dark:text-white" />
               )}
             </button>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-auto mt-16  md:p-6 pr-6">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>

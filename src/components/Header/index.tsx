@@ -32,7 +32,7 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("Leon_user");
-    localStorage.removeItem("Farm_user");
+    localStorage.removeItem("Leon_user");
     setUser(null);
     setShowDropdown(false);
     router.push("/signin");

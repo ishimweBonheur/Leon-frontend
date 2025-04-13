@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import { api, queryString } from "./api";
 
 interface JobApplication {
+  createdAt: any;
+  updatedAt: string | number | Date;
   _id: string;
   user: {
     _id: string;
@@ -60,11 +62,9 @@ export const useJobApplication = () => {
   const updateApplicationStatus = async (applicationId: string, status: string) => {
     console.log("Updating", applicationId, "to status", status); // 🧪 Add this
     setLoading(true);
-    try 
-    {await api.patch(`/applications/${applicationId}/status`, { status });
+    try {
+      await api.patch(`/applications/${applicationId}/status`, { status });
       fetchApplications();
-      
-
       toast.success("Application status updated successfully");
     } catch (error: any) {
       handleApplicationError(error, "updating application status");
@@ -72,6 +72,8 @@ export const useJobApplication = () => {
       setLoading(false);
     }
   };
+  
+  
 
   const getAllApplications = async () => {
     setLoading(true);
