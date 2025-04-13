@@ -29,7 +29,7 @@ ChartJS.register(
   ArcElement
 );
 
-const dashboard = () => {
+const Dashboard = () => {
   const [datasetType, setDatasetType] = useState<'applications' | 'hired'>('applications');
   const [timeRange, setTimeRange] = useState<'monthly' | 'quarterly'>('monthly');
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics'>('overview');
@@ -62,7 +62,7 @@ const dashboard = () => {
     const interval = setInterval(() => {
       fetchJobs?.();
       getAllApplications?.();
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -239,4 +239,4 @@ const dashboard = () => {
   );
 };
 
-export default dashboard;
+export default Dashboard;
