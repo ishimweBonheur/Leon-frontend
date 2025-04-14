@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import SectionTitle from "../Common/SectionTitle";
 import { motion } from "framer-motion";
@@ -11,18 +12,34 @@ const checkIcon = (
 );
 
 const AboutSectionOne = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const List = ({ text }) => (
     <motion.p
-      className="mb-5 flex items-center text-lg font-medium text-body-color"
+      className={`mb-5 flex items-center text-lg font-medium ${
+        isLoading ? "animate-pulse text-gray-400" : "text-body-color"
+      }`}
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <span className="mr-4 flex h-[30px] w-[30px] items-center justify-center rounded-md bg-primary bg-opacity-10 text-primary">
+      <span
+        className={`mr-4 flex h-[30px] w-[30px] items-center justify-center rounded-md ${
+          isLoading
+            ? "bg-gray-300 text-gray-300 animate-pulse"
+            : "bg-primary bg-opacity-10 text-primary"
+        }`}
+      >
         {checkIcon}
       </span>
-      {text}
+      {isLoading ? <span className="w-32 h-4 bg-gray-300 rounded animate-pulse"></span> : text}
     </motion.p>
   );
 
@@ -45,11 +62,21 @@ const AboutSectionOne = () => {
                 transition={{ duration: 0.6, ease: "easeOut", delay: 0.05 }}
                 viewport={{ once: false, amount: 0.3 }}
               >
-                <SectionTitle
-                  title="About Léon Services"
-                  paragraph="At Léon Services, we are committed to empowering businesses by providing innovative workforce solutions. With a focus on professionalism, integrity, and efficiency, our services help businesses streamline HR processes, enhance employee performance, and ensure compliance with local and international regulations."
-                  mb="44px"
-                />
+                {isLoading ? (
+                  <div className="animate-pulse space-y-4 mb-10">
+                    <div className="h-6 w-2/3 bg-gray-300 rounded" />
+                    <div className="h-4 w-full bg-gray-200 rounded" />
+                    <div className="h-4 w-5/6 bg-gray-200 rounded" />
+                    <div className="h-4 w-3/4 bg-gray-200 rounded" />
+                  </div>
+                ) : (
+                  <SectionTitle
+                    title="About Léon Services"
+                    paragraph="At Léon Services, we are committed to empowering businesses by providing innovative workforce solutions. With a focus on professionalism, integrity, and efficiency, our services help businesses streamline HR processes, enhance employee performance, and ensure compliance with local and international regulations."
+                    mb="44px"
+                  />
+                )}
+
                 <div className="mx-[-12px] flex flex-wrap">
                   <div className="w-full px-3 sm:w-1/2 lg:w-full xl:w-1/2">
                     <List text="Professional Workforce Solutions" />
@@ -67,24 +94,30 @@ const AboutSectionOne = () => {
 
             <div className="w-full px-4 lg:w-1/2">
               <motion.div
-                className="relative mx-auto aspect-[25/24] max-w-[500px] lg:mr-0"
+                className={`relative mx-auto aspect-[25/24] max-w-[500px] lg:mr-0 ${
+                  isLoading ? "bg-gray-200 animate-pulse rounded-md" : ""
+                }`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, ease: "easeIn", delay: 0.4 }}
                 viewport={{ once: false, amount: 0.3 }}
               >
-                <Image
-                  src="/images/about/about-image-2.svg"
-                  alt="About Léon Services"
-                  fill
-                  className="mx-auto max-w-full drop-shadow-three dark:hidden dark:drop-shadow-none lg:mr-0"
-                />
-                <Image
-                  src="/images/about/about-image-dark.svg"
-                  alt="About Léon Services Dark"
-                  fill
-                  className="mx-auto hidden max-w-full drop-shadow-three dark:block dark:drop-shadow-none lg:mr-0"
-                />
+                {!isLoading && (
+                  <>
+                    <Image
+                      src="/images/about/about-image-2.svg"
+                      alt="About Léon Services"
+                      fill
+                      className="mx-auto max-w-full drop-shadow-three dark:hidden dark:drop-shadow-none lg:mr-0"
+                    />
+                    <Image
+                      src="/images/about/about-image-dark.svg"
+                      alt="About Léon Services Dark"
+                      fill
+                      className="mx-auto hidden max-w-full drop-shadow-three dark:block dark:drop-shadow-none lg:mr-0"
+                    />
+                  </>
+                )}
               </motion.div>
             </div>
           </div>

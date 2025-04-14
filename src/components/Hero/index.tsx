@@ -1,23 +1,39 @@
 "use client";
-import { motion } from "framer-motion"
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 
-
 const Hero = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsLoading(false), 1500); // simulate loading
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
-    <>
-      <section
-        id="home"
-        className="relative z-10 overflow-hidden bg-white pb-16 pt-[120px] dark:bg-gray-dark md:pb-[120px] md:pt-[150px] xl:pb-[160px] xl:pt-[180px] 2xl:pb-[200px] 2xl:pt-[210px]"
-      >
-        <div className="container">
-          <div className="-mx-4 flex flex-wrap">
-            <div className="w-full px-4">
+    <section
+      id="home"
+      className="relative z-10 overflow-hidden bg-white pb-16 pt-[120px] dark:bg-gray-dark md:pb-[120px] md:pt-[150px] xl:pb-[160px] xl:pt-[180px] 2xl:pb-[200px] 2xl:pt-[210px]"
+    >
+      <div className="container">
+        <div className="-mx-4 flex flex-wrap">
+          <div className="w-full px-4">
+            {isLoading ? (
+              <div className="mx-auto max-w-[800px] text-center animate-pulse">
+                <div className="mb-20 h-10 w-3/4 mx-auto bg-gray-200 rounded dark:bg-gray-700"></div>
+                <div className="mb-20 h-4 w-2/3 mx-auto bg-gray-200 rounded dark:bg-gray-700"></div>
+                <div className="h-9 w-1/2 mx-auto bg-gray-200 rounded dark:bg-gray-700"></div>
+                <div className="mt-9 flex justify-center space-x-4">
+                  <div className="h-10 w-32 bg-gray-200 rounded dark:bg-gray-700"></div>
+                  <div className="h-10 w-32 bg-gray-200 rounded dark:bg-gray-700"></div>
+                </div>
+              </div>
+            ) : (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0, ease: "easeOut" }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
                 viewport={{ once: true }}
                 className="mx-auto max-w-[800px] text-center"
               >
@@ -38,9 +54,8 @@ const Hero = () => {
                   viewport={{ once: true }}
                   className="mb-8 text-base leading-relaxed text-body-color dark:text-body-color-dark sm:text-lg md:text-xl"
                 >
-                  At Léon Services, we streamline workforce management and recruitment for forward-thinking companies. Whether you&rsquo;re seeking top-tier talent or looking to outsource HR operations, our personalized solutions help you save time, minimize administrative load, and access pre-screened professionals eager to drive your success.
+                  At Léon Services, we streamline workforce management and recruitment for forward-thinking companies...
                 </motion.p>
-
 
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 1.05 }}>
@@ -62,11 +77,11 @@ const Hero = () => {
                   </motion.div>
                 </div>
               </motion.div>
-            </div>
+            )}
           </div>
         </div>
-
-        <div className="absolute right-0 top-0 z-[-1] opacity-30 lg:opacity-100">
+      </div>
+      <div className="absolute right-0 top-0 z-[-1] opacity-30 lg:opacity-100">
           <svg
             width="450"
             height="556"
@@ -307,8 +322,7 @@ const Hero = () => {
             </defs>
           </svg>
         </div>
-      </section>
-    </>
+    </section>
   );
 };
 

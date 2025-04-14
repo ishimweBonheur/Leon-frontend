@@ -93,9 +93,6 @@ const LanguageSelector = () => {
 
     setSelectedLanguage(langCode);
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
   };
 
   return (

@@ -23,6 +23,14 @@ export const useLogin = () => {
             storage.setToken(token);
             localStorage.setItem('Leon_user', JSON.stringify(user)); 
             setLoginSuccess(true);
+
+            console.log(response);
+        if( response.data.user.role === 'admin'){
+            window.location.href = '/dashboard';
+        }
+        else{
+            window.location.href = '/';
+        }
            
             return response.data;
         } catch (error: any) {

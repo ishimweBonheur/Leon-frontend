@@ -4,7 +4,6 @@ import { useJobs } from "@/Hooks/jobs";
 import Link from "next/link";
 import { useJobApplication } from "@/Hooks/applications";
 import { useParams } from "next/navigation";
-import toast from "react-hot-toast";
 import { useTheme } from "next-themes";
 
 interface Job {
@@ -91,10 +90,11 @@ const JobDetailPage = () => {
         linkedInProfile: "",
         additionalInfo: "",
       });
-      toast.success("Application submitted successfully!")
+      console.log("Application submitted successfully!");
       setShowModal(false);
     } catch (err) {
-      toast.error("Application failed:", err);
+      console.error("Error submitting application:", err);
+      
     }
   };
   const { theme } = useTheme();
@@ -270,12 +270,7 @@ const JobDetailPage = () => {
                     <span className="flex items-center text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
                       📍 {job.location}
                     </span>
-                    <span className="flex items-center text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
-                      🏢 {job.type}
-                    </span>
-                    <span className="flex items-center text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
-                      🎯 {job.experience} Level
-                    </span>
+              
                   </div>
                 </div>
 
