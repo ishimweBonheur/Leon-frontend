@@ -25,7 +25,7 @@ export const useSendEmail = (applications: Application[], fetchApplications: () 
     html?: string
   ) => {
     try {
-      await axios.post('/api/email/send', {
+      await api.post('/api/email/send', {
         to,
         subject,
         text,
