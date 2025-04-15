@@ -25,7 +25,7 @@ export const useSendEmail = (applications: Application[], fetchApplications: () 
     html?: string
   ) => {
     try {
-      await api.post('/api/email/send', {
+      await api.post('/email/send', {
         to,
         subject,
         text,
