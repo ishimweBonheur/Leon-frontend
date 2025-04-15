@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { api, queryString } from "./api";
@@ -31,6 +31,7 @@ export const useJobApplication = () => {
   const [error, setError] = useState<any>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
+  // Fetching all job applications
   const fetchApplications = async () => {
     setLoading(true);
     try {
@@ -43,13 +44,16 @@ export const useJobApplication = () => {
     }
   };
 
+  // Apply to a job and send email notification
   const applyToJob = async (
     jobId: string,
-    applicationData: Omit<JobApplication, "_id" | "job" | "user" | "status">
+    applicationData: Omit<JobApplication, "_id" | "job" | "user" | "status">,
+    userEmail: string
   ) => {
     setLoading(true);
     try {
       await api.post(`/applications/${jobId}/apply`, applicationData);
+      sendEmail(userEmail, "Job Application Submitted", "You have successfully applied to the job.");
       toast.success("Application submitted successfully");
       fetchApplications();
     } catch (error: any) {
@@ -59,6 +63,7 @@ export const useJobApplication = () => {
     }
   };
 
+  // Update application status and send email notification
   const updateApplicationStatus = async (applicationId: string, status: string) => {
     console.log("Updating", applicationId, "to status", status); // 🧪 Add this
     setLoading(true);
@@ -66,16 +71,30 @@ export const useJobApplication = () => {
       await api.patch(`/applications/${applicationId}/status`, { status });
       fetchApplications();
       toast.success("Application status updated successfully");
+      
+      // Send email to the user after status update
+      const application = applications.find(app => app._id === applicationId);
+      if (application) {
+        sendEmail(application.user.email, "Application Status Updated", `Your application status has been updated to: ${status}`);
+      }
     } catch (error: any) {
       handleApplicationError(error, "updating application status");
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
-  const getAllApplications = async () => {
+  // Send an email (you can use a service like SendGrid or Nodemailer here)
+  const sendEmail = async (to: string, subject: string, message: string) => {
+    try {
+      await axios.post("/api/email", { to, subject, message });
+      console.log("Email sent successfully");
+    } catch (error) {
+      console.error("Error sending email:", error);
+    }
+  };
+
+  const getAllApplications = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get("/applications");
@@ -85,7 +104,7 @@ export const useJobApplication = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const getApplicationsByJob = async (jobId: string) => {
     setLoading(true);
@@ -152,7 +171,7 @@ export const useJobApplication = () => {
       error.response?.data?.error ||
       `An error occurred while ${action}.`;
     setError(message);
-    console.error(`Error while ${action}:`, error); // Added logging for debugging
+    console.error(`Error while ${action}:`, error);
   };
 
   return {

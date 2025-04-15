@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useJobs } from "@/Hooks/jobs";
 import Link from "next/link";
 import { useJobApplication } from "@/Hooks/applications";
+
 import { useParams } from "next/navigation";
 import { useTheme } from "next-themes";
 
@@ -58,13 +59,11 @@ const JobDetailPage = () => {
     e.preventDefault();
     
     try {
-      // Upload files to Cloudinary first
       const resumeUrl = formData.resume ? await uploadFile(formData.resume) : "";
       const coverLetterUrl = formData.coverLetter ? await uploadFile(formData.coverLetter) : "";
 
-      // Prepare application data
       const applicationData = {
-        user: formData.email, // Or use user ID if logged in
+        user: formData.email, 
         job: id as string,
         cv: resumeUrl,
         coverLetter: coverLetterUrl,
@@ -76,10 +75,9 @@ const JobDetailPage = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      // Submit application using the hook
-      await applyToJob(id as string, applicationData);
+
+      await applyToJob(id as string, applicationData, formData.email);
       
-      // Reset form and close modal on success
       setFormData({
         name: "",
         email: "",
@@ -111,8 +109,8 @@ const JobDetailPage = () => {
     <>
       {/* MODAL OVERLAY */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
-          <div className="bg-white dark:bg-[#1E293B] rounded-lg p-6 w-full max-w-3xl z-50 relative  overflow-y-auto max-h-[90vh]">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center mt-20">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-3xl z-50 relative  overflow-y-auto max-h-[90vh]">
             <button
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-white text-xl"
               onClick={() => setShowModal(false)}
@@ -284,7 +282,7 @@ const JobDetailPage = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  {daysLeft} days left to apply
+                  {daysLeft? ` ${daysLeft} days left` : 'Closed'}
                 </div>
               </div>
             </div>
@@ -330,7 +328,7 @@ const JobDetailPage = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Applications</p>
-                    <p className="font-medium">{job.status || 'Open'}</p>
+                    <p className="font-medium">{daysLeft ? 'Applications Open' : 'Applications Closed'}</p>
                   </div>
                 </div>
               </div>
