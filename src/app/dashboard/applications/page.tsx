@@ -26,11 +26,11 @@ interface Application {
 
 export default function ManageApplicationsPage() {
   const { getAllApplications, updateApplicationStatus, loading, error, applications } = useJobApplication();
-  const { updateApplicationStatus: updateStatusWithEmail, loading: emailLoading } = useSendEmail(applications, getAllApplications); 
+  const { updateApplicationStatus: updateStatusWithEmail, loading: emailLoading } = useSendEmail(applications, getAllApplications);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const applicationsPerPage = 4; 
-  const totalPages = Math.ceil(applications.length / applicationsPerPage); 
+  const applicationsPerPage = 4;
+  const totalPages = Math.ceil(applications.length / applicationsPerPage);
   const paginatedApplications = applications.slice(
     (currentPage - 1) * applicationsPerPage,
     currentPage * applicationsPerPage
@@ -38,7 +38,7 @@ export default function ManageApplicationsPage() {
 
   useEffect(() => {
     getAllApplications();
-  }, [getAllApplications]); 
+  }, [getAllApplications]);
 
   const handleStatusChange = (applicationId: string, status: string) => {
     updateStatusWithEmail(applicationId, status);
@@ -93,6 +93,7 @@ export default function ManageApplicationsPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex flex-col sm:flex-row gap-2">
+
                         <button
                           onClick={() => handleStatusChange(app._id, "Accepted")}
                           className="bg-green-600 text-white px-3 py-1 rounded text-sm"
@@ -106,6 +107,16 @@ export default function ManageApplicationsPage() {
                         >
                           Reject
                         </button>
+
+                        <button
+                          onClick={() => handleStatusChange(app._id, "Shortlisted")}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                        >
+                          Shortlist
+                        </button>
+
+
+
                       </div>
                     </td>
                   </tr>
@@ -146,7 +157,7 @@ export default function ManageApplicationsPage() {
             className={`px-4 py-2 rounded ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-gray-600 text-white hover:bg-gray-700"}`}
           >
             Next
-          </button> 
+          </button>
         </div>
 
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}

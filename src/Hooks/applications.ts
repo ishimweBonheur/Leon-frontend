@@ -3,8 +3,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { api, queryString } from "./api";
 
-interface JobApplication {
-  createdAt: any;
+export interface JobApplication {
+  createdAt: string | Date;
   updatedAt: string | number | Date;
   _id: string;
   user: {
@@ -28,8 +28,21 @@ interface JobApplication {
 export const useJobApplication = () => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  const getApplicationById = async (applicationId: string): Promise<JobApplication | null> => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/applications/${applicationId}`);
+      return response.data;
+    } catch (error: any) {
+      handleApplicationError(error, "retrieving application by ID");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetching all job applications
   const fetchApplications = async () => {
@@ -132,6 +145,7 @@ export const useJobApplication = () => {
 
   const getApplicationsByStatus = async (status: string) => {
     setLoading(true);
+    setError(null); // Clear error before fetching
     try {
       const response = await axios.get(`/api/applications/status/${status}`);
       return response.data;
@@ -187,5 +201,6 @@ export const useJobApplication = () => {
     getApplicationsByStatus,
     getAllApplications,
     uploadFile,
+    getApplicationById,
   };
 };

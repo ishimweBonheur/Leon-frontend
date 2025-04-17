@@ -1,22 +1,24 @@
 "use client";
-import { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast'; 
-import { api } from './api'; 
-import { useJobApplication } from './applications';
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { api } from "./api";
+import { emailTemplates } from "@/utils/emailTemplates";
 
 interface Application {
   _id: string;
   user: {
     email: string;
   };
+  job?: {
+    title: string;
+  };
   status: string;
 }
 
 export const useSendEmail = (applications: Application[], fetchApplications: () => void) => {
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const sendEmail = async (
     to: string,
@@ -25,38 +27,44 @@ export const useSendEmail = (applications: Application[], fetchApplications: () 
     html?: string
   ) => {
     try {
-      await api.post('/email/send', {
+      await api.post("/email/send", {
         to,
         subject,
         text,
         html,
       });
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to send email');
+      toast.error(error.response?.data?.error || "Failed to send email");
     }
   };
 
   const updateApplicationStatus = async (applicationId: string, status: string) => {
     setLoading(true);
-    setSuccessMessage('');
-    setErrorMessage('');
+    setSuccessMessage("");
+    setErrorMessage("");
 
     try {
       await api.patch(`/applications/${applicationId}/status`, { status });
       await fetchApplications();
       toast.success("Application status updated successfully");
 
-      const application = applications.find(app => app._id === applicationId);
-      console.log( application); 
+      const application = applications.find((app) => app._id === applicationId);
+
       if (application) {
-        const emailText = `Your application status has been updated to: ${status}`;
-        const emailHtml = `<p>Your application status has been updated to: <strong>${status}</strong>.</p>`;
+        const jobTitle = application.job?.title || "Unknown Position";
+        const applicationLink = `${process.env.NEXT_PUBLIC_BASE_URL}/applications/${application._id}`;
+
+        const { subject, text, html } = emailTemplates.applicationStatusUpdate(
+          status,
+          jobTitle,
+          applicationLink
+        );
 
         await sendEmail(
           application.user.email,
-          `Application Status Update`,
-          emailText,
-          emailHtml
+          subject,
+          text,
+          html
         );
       }
     } catch (error: any) {
