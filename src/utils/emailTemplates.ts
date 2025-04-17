@@ -23,16 +23,6 @@ The Recruitment Team`,
         <strong>${jobTitle}</strong> has been 
         <strong style="color: #1a73e8;">${status}</strong>.</p>
 
-        <p>You can view your full application details by clicking the button below:</p>
-
-        <p style="text-align: center; margin: 20px 0;">
-          <a href="${getApplicationById}" 
-            style="background-color: #1a73e8; color: white; padding: 12px 20px; 
-                   text-decoration: none; border-radius: 5px; display: inline-block;">
-            View Application
-          </a>
-        </p>
-
         <p>Thank you for applying and taking the time to go through our recruitment process.</p>
 
         <p>Best regards,<br/>The Recruitment Team</p>
