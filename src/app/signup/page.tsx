@@ -69,13 +69,10 @@ const SignupPage = () => {
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleFailure}
-                    width=""
-                    size="large"
                     theme="filled_blue"
                     text="continue_with"
                     shape="rectangular"
                     logo_alignment="left"
-                    useOneTap={false}
                   />
               </GoogleOAuthProvider>
 

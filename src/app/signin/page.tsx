@@ -62,13 +62,10 @@ const SigninPage = () => {
               <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleFailure}
-                    width=""
-                    size="large"
                     theme="filled_blue"
                     text="continue_with"
                     shape="rectangular"
                     logo_alignment="left"
-                    useOneTap={false}
                   />
               </GoogleOAuthProvider>
               <div className="mb-8 flex items-center justify-center">
