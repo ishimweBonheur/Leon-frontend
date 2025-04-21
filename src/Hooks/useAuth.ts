@@ -2,17 +2,17 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { api, queryString } from './api';
 import { storage } from '@/utils/storage';
-import { jwtDecode } from 'jwt-decode'
-
-
+import { jwtDecode } from 'jwt-decode';
 
 export const baseURL = 'https://localhost:8000';
 
+// =============================
+// Email/Password Login
+// =============================
 export const useLogin = () => {
     const [loadingLogin, setLoadingLogin] = useState(false);
     const [loginSuccess, setLoginSuccess] = useState(false);
     const [loginError, setLoginError] = useState<string | null>(null);
-   
 
     const login = async (credentials: { email: string; password: string }) => {
         setLoadingLogin(true);
@@ -21,17 +21,17 @@ export const useLogin = () => {
             const response = await api.post('/auth/login', credentials);
             const { token, user } = response.data;
             storage.setToken(token);
-            localStorage.setItem('Leon_user', JSON.stringify(user)); 
+            localStorage.setItem('Leon_user', JSON.stringify(user));
             setLoginSuccess(true);
 
             console.log(response);
-        if( response.data.user.role === 'admin'){
-            window.location.href = '/dashboard';
-        }
-        else{
-            window.location.href = '/';
-        }
-           
+
+            if (user.role === 'admin') {
+                window.location.href = '/dashboard';
+            } else {
+                window.location.href = '/';
+            }
+
             return response.data;
         } catch (error: any) {
             const errorMessage =
@@ -51,9 +51,45 @@ export const useLogin = () => {
     };
 };
 
+// =============================
+// Google Login
+// =============================
+export const loginWithGoogle = async (googleToken: string) => {
+    try {
+        const response = await api.post('/auth/google', {
+            tokenId: googleToken, // Ensure this matches the backend
+        });
 
+        const { token, user, isNew } = response.data;
+
+        // Save token and user data in local storage
+        storage.setToken(token);
+        localStorage.setItem('Leon_user', JSON.stringify(user));
+
+        // Redirect based on user role
+        if (user.role === 'admin') {
+            window.location.href = '/dashboard';
+        } else {
+            window.location.href = '/';
+        }
+
+        // Show appropriate toast message
+        toast.success(isNew ? 'Registered successfully with Google' : 'Logged in with Google');
+        return user;
+    } catch (error: any) {
+        const msg = error.response?.data?.error || 'Google login/registration failed.';
+        toast.error(msg);
+        console.error(msg);
+    }
+};
+
+
+
+// =============================
+// Check if Logged In
+// =============================
 export const isLoggedIn = () => {
-    if (typeof window === 'undefined') return false; 
+    if (typeof window === 'undefined') return false;
     const token = storage.getToken();
     if (token) {
         const decodedToken: { exp: number } = jwtDecode(token);
@@ -73,10 +109,14 @@ export const isLoggedIn = () => {
     return false;
 };
 
+// =============================
+// User CRUD (Admin)
+// =============================
 export const useUsers = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
+
     const fetchUsers = async (query?: string) => {
         setLoading(true);
         try {
@@ -95,7 +135,6 @@ export const useUsers = () => {
             await api.post('/auth/register', user);
             fetchUsers();
             toast.success('User Created successfully');
-  
         } catch (error: any) {
             handleUserError(error);
         } finally {

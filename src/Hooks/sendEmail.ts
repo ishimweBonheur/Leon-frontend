@@ -8,17 +8,20 @@ interface Application {
   _id: string;
   user: {
     email: string;
+    firstName: string;
+    lastName: string;
   };
   job?: {
     title: string;
   };
   status: string;
 }
-
 export const useSendEmail = (applications: Application[], fetchApplications: () => void) => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+
 
   const sendEmail = async (
     to: string,
@@ -57,6 +60,8 @@ export const useSendEmail = (applications: Application[], fetchApplications: () 
         const { subject, text, html } = emailTemplates.applicationStatusUpdate(
           status,
           jobTitle,
+          application.user.firstName,
+
           applicationLink
         );
 
