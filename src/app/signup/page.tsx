@@ -65,7 +65,7 @@ const SignupPage = () => {
               
               {/* Properly Styled Google Login */}
               <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
-                
+                <div className="mb-6 flex items-center justify-center w-full">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleFailure}
@@ -74,6 +74,7 @@ const SignupPage = () => {
                     shape="rectangular"
                     logo_alignment="left"
                   />
+                  </div>
               </GoogleOAuthProvider>
 
               <div className="mb-8 flex items-center justify-center">
