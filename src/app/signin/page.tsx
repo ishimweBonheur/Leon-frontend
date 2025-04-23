@@ -58,16 +58,18 @@ const SigninPage = () => {
               <p className="mb-11 text-center text-base font-medium text-body-color">
                 Login to your account for a faster checkout.
               </p>
+              <div className="mb-8 flex items-center justify-center w-full">
               <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
               <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleFailure}
                     theme="filled_blue"
                     text="continue_with"
-                    shape="rectangular"
                     logo_alignment="left"
+                    width={"100%"}
                   />
               </GoogleOAuthProvider>
+              </div>
               <div className="mb-8 flex items-center justify-center">
                   <span className="hidden h-[1px] w-full max-w-[70px] bg-body-color/50 sm:block"></span>
                   <p className="w-full px-5 text-center text-base font-medium text-body-color">
