@@ -73,21 +73,19 @@ export const loginWithGoogle = async (googleToken: string) => {
             window.location.href = '/';
         }
 
-        // Show appropriate toast message
         toast.success(isNew ? 'Registered successfully with Google' : 'Logged in with Google');
         return user;
     } catch (error: any) {
-        const msg = error.response?.data?.error || 'Google login/registration failed.';
+        const msg = error.response?.data?.error || 'Google login failed. Please Register...';
         toast.error(msg);
         console.error(msg);
+        window.location.href = '/signup'; 
     }
 };
 
 
 
-// =============================
 // Check if Logged In
-// =============================
 export const isLoggedIn = () => {
     if (typeof window === 'undefined') return false;
     const token = storage.getToken();
