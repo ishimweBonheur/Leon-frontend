@@ -27,7 +27,7 @@ export const useLogin = () => {
             console.log(response);
 
             if (user.role === 'admin') {
-                window.location.href = '/dashboard';
+                window.location.href = '/';
             } else {
                 window.location.href = '/';
             }
@@ -68,7 +68,7 @@ export const loginWithGoogle = async (googleToken: string) => {
 
         // Redirect based on user role
         if (user.role === 'admin') {
-            window.location.href = '/dashboard';
+            window.location.href = '/';
         } else {
             window.location.href = '/';
         }
