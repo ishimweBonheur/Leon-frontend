@@ -9,19 +9,25 @@ declare global {
 }
 
 const getCurrentLanguage = () => {
-  if (typeof document === 'undefined') return 'en';
+  if (typeof window === 'undefined' || typeof document === 'undefined') return 'en';
   
-  const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
-  return match ? match[1] : "en";
+  const match = document.cookie.match(/googtrans=(\/[^/]+\/(\w+))/);
+  return match ? match[2] : "en";
 };
 
 const LanguageSelector = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(getCurrentLanguage());
-  const [widgetInitialized, setWidgetInitialized] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const isBrowser = typeof window !== 'undefined';
+
+  useEffect(() => {
+    if (isBrowser) {
+      setSelectedLanguage(getCurrentLanguage());
+    }
+  }, [isBrowser]);
 
   const initializeGoogleTranslate = () => {
-    if (window.google && window.google.translate) {
+    if (isBrowser && window.google?.translate) {
       new window.google.translate.TranslateElement(
         {
           pageLanguage: "en",
@@ -32,34 +38,40 @@ const LanguageSelector = () => {
         "google_translate_element"
       );
       setIsLoaded(true);
-      setWidgetInitialized(true);
       removeTranslateBanner();
     }
   };
 
   const removeTranslateBanner = () => {
-    const elements = document.querySelectorAll(".goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame");
-    elements.forEach((el) => {
-      (el as HTMLElement).style.display = "none";
-    });
+    if (!isBrowser) return;
+    
+    const banner = document.querySelector('.goog-te-banner-frame');
+    if (banner) {
+      (banner as HTMLElement).style.display = "none";
+    }
     document.body.style.top = "0px";
   };
 
   const loadGoogleTranslateScript = () => {
+    if (!isBrowser) return;
+
     const scriptId = "google-translate-script";
-    if (!document.querySelector(`#${scriptId}`)) {
+    if (!document.getElementById(scriptId)) {
       const script = document.createElement("script");
       script.id = scriptId;
-      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
       script.async = true;
+      script.crossOrigin = "anonymous";
       document.body.appendChild(script);
     }
   };
 
   useEffect(() => {
+    if (!isBrowser) return;
+
     window.googleTranslateElementInit = initializeGoogleTranslate;
 
-    if (!window.google || !window.google.translate) {
+    if (!window.google?.translate) {
       loadGoogleTranslateScript();
     } else {
       initializeGoogleTranslate();
@@ -67,40 +79,41 @@ const LanguageSelector = () => {
 
     const style = document.createElement("style");
     style.innerHTML = `
-      .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame, .goog-te-gadget {
+      .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame {
         display: none !important;
       }
       body { top: 0px !important; }
+      .goog-te-combo { display: none; }
     `;
     document.head.appendChild(style);
 
-    const observer = new MutationObserver(removeTranslateBanner);
-    observer.observe(document.body, { childList: true, subtree: true });
-
     return () => {
-      observer.disconnect();
       document.head.removeChild(style);
     };
-  }, []);
+  }, [isBrowser]);
 
   const changeLanguage = (langCode: string) => {
-    if (!isLoaded) return;
+    if (!isBrowser || !isLoaded) return;
 
-    document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${window.location.hostname}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    const domain = window.location.hostname === 'localhost' 
+      ? 'localhost' 
+      : window.location.hostname;
 
+    document.cookie = `googtrans=/en/${langCode}; path=/; domain=${domain}; max-age=31536000; secure; samesite=lax`;
     setSelectedLanguage(langCode);
-
-    const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
-    if (translateSelect) {
-      translateSelect.value = langCode;
-      const event = new Event('change', { bubbles: true });
-      translateSelect.dispatchEvent(event);
-    }
 
     setTimeout(() => {
       window.location.reload();
     }, 100);
   };
+
+  if (!isBrowser) {
+    return (
+      <select className="border-stroke rounded-lg border bg-[#f8f8f8] px-4 py-2">
+        <option>English</option>
+      </select>
+    );
+  }
 
   return (
     <div style={{ position: "relative", zIndex: 1000 }}>
@@ -108,7 +121,6 @@ const LanguageSelector = () => {
         onChange={(e) => changeLanguage(e.target.value)}
         value={selectedLanguage}
         className="border-stroke rounded-lg border bg-[#f8f8f8] px-4 py-2 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-        id="languageSwitcher"
       >
         <option value="en">English</option>
         <option value="fr">Français</option>
