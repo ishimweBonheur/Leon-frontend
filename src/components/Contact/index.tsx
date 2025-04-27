@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NewsLatterBox from "./NewsLatterBox";
-import { motion } from "framer-motion"; 
-
+import { motion } from "framer-motion";
+import { useContact } from "@/Hooks/contact";
+import { toast } from "react-hot-toast";
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -13,6 +13,7 @@ const Contact = () => {
     message: "",
   });
   const [loading, setLoading] = useState(false);
+  const { createContact } = useContact(); // Destructure createContact from the useContact hook
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -23,16 +24,19 @@ const Contact = () => {
     });
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      toast.success("Your message has been sent successfully!");
+      // Call createContact API function
+      await createContact(formData.name, formData.email, formData.message);
+      // Reset form on success
       setFormData({ name: "", email: "", message: "" });
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      toast.error("Failed to send your message. Please try again.");
+      toast.success("Ticket submitted successfully!");
+    } catch (error: any) {
+      console.error("Error submitting the contact form", error);
     } finally {
       setLoading(false);
     }
@@ -53,11 +57,12 @@ const Contact = () => {
                 Need HR Support? Open a Ticket
               </h2>
               <p className="mb-12 text-base font-medium text-body-color">
-                Our dedicated HR support team is here to help. Reach out with your queries, and we'll respond promptly via email.
+                Our dedicated HR support team is here to help. Reach out with
+                your queries, and we'll respond promptly via email.
               </p>
 
               <motion.form
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit} // Handle form submission
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
@@ -148,9 +153,6 @@ const Contact = () => {
                   </motion.div>
                 </div>
               </motion.form>
-
-              {/* Toast Notification Container */}
-              <ToastContainer />
             </div>
           </motion.div>
           <motion.div
