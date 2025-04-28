@@ -1,9 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { useTheme } from "next-themes";
+import { useSubscription } from "@/Hooks/subscriptions"; // adjust the path
+import { toast } from "react-hot-toast";
 
 const NewsLatterBox = () => {
   const { theme } = useTheme();
+  const { createSubscription, loading } = useSubscription();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.email) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    try {
+      await createSubscription(formData);
+      toast.success("Thank you for subscribing!");
+      setFormData({ name: "", email: "" });
+    } catch (error) {
+      console.error(error);
+      // Error is already handled inside useSubscription with toast, so optional here
+    }
+  };
 
   return (
     <div className="relative z-10 rounded-sm bg-white p-8 shadow-three dark:bg-gray-dark sm:p-11 lg:p-8 xl:p-11">
@@ -14,28 +48,34 @@ const NewsLatterBox = () => {
         Stay informed with the latest trends, best practices, and expert tips in HR management. Subscribe now to receive timely updates straight to your inbox.
       </p>
 
-      <div>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="name"
+          value={formData.name}
+          onChange={handleChange}
           placeholder="Enter your name"
           className="border-stroke mb-4 w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
         />
         <input
           type="email"
           name="email"
+          value={formData.email}
+          onChange={handleChange}
           placeholder="Enter your email"
           className="border-stroke mb-4 w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
         />
-        <input
+        <button
           type="submit"
-          value="Subscribe"
-          className="mb-5 flex w-full cursor-pointer items-center justify-center rounded-sm bg-primary px-9 py-4 text-base font-medium text-white shadow-submit duration-300 hover:bg-primary/90 dark:shadow-submit-dark"
-        />
+          disabled={loading}
+          className="mb-5 flex w-full cursor-pointer items-center justify-center rounded-sm bg-primary px-9 py-4 text-base font-medium text-white shadow-submit duration-300 hover:bg-primary/90 dark:shadow-submit-dark disabled:opacity-50"
+        >
+          {loading ? "Subscribing..." : "Subscribe"}
+        </button>
         <p className="text-center text-base leading-relaxed text-body-color dark:text-body-color-dark">
           No spam guaranteed, So please don’t send any spam mail.
         </p>
-      </div>
+      </form>
 
       <div>
         <span className="absolute left-2 top-7">
@@ -54,26 +94,18 @@ const NewsLatterBox = () => {
             <defs>
               <linearGradient
                 id="paint0_linear_1028_600"
-                x1="-18.3187"
-                y1="55.1044"
-                x2="37.161"
-                y2="15.3509"
+                x1="-13.8507"
+                y1="15.9338"
+                x2="31.6982"
+                y2="65.0416"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0.62"
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0.62" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
               </linearGradient>
             </defs>
           </svg>
         </span>
-
         <span className="absolute bottom-24 left-1.5">
           <svg
             width="39"
@@ -84,32 +116,24 @@ const NewsLatterBox = () => {
           >
             <path
               opacity="0.5"
-              d="M14.7137 31.4215L38.6431 4.24115L6.96581e-07 0.624124L14.7137 31.4215Z"
+              d="M14.7137 31.4215L38.6431 4.24115L6.96581 6.21983L14.7137 31.4215Z"
               fill="url(#paint0_linear_1028_601)"
             />
             <defs>
               <linearGradient
                 id="paint0_linear_1028_601"
-                x1="39.1948"
-                y1="38.335"
-                x2="10.6982"
-                y2="10.2511"
+                x1="8.44425"
+                y1="28.4024"
+                x2="38.6478"
+                y2="3.44025"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0.62"
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0.62" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
               </linearGradient>
             </defs>
           </svg>
         </span>
-
         <span className="absolute right-2 top-[140px]">
           <svg
             width="38"
@@ -120,32 +144,24 @@ const NewsLatterBox = () => {
           >
             <path
               opacity="0.5"
-              d="M10.6763 35.3091C23.3976 41.6367 38.1681 31.7045 37.107 17.536C36.1205 4.3628 21.9407 -3.46901 10.2651 2.71063C-2.92254 9.69061 -2.68321 28.664 10.6763 35.3091Z"
+              d="M10.6763 35.3091C23.3976 41.6367 38.1681 31.7045 37.107 17.536C36.0455 3.36746 21.698 -5.66705 8.97669 0.660527C-3.74463 6.9881 -4.80595 21.1566 6.25535 35.3091"
               fill="url(#paint0_linear_1028_602)"
             />
             <defs>
               <linearGradient
                 id="paint0_linear_1028_602"
-                x1="-0.571054"
-                y1="-37.1717"
-                x2="28.7937"
-                y2="26.7564"
+                x1="5.60864"
+                y1="36.5299"
+                x2="24.553"
+                y2="-3.9256"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0.62"
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0.62" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
               </linearGradient>
             </defs>
           </svg>
         </span>
-
         <span className="absolute right-0 top-0">
           <svg
             width="162"
@@ -157,97 +173,69 @@ const NewsLatterBox = () => {
             <g opacity="0.3">
               <path
                 opacity="0.45"
-                d="M1 89.9999C8 77.3332 27.7 50.7999 50.5 45.9999C79 39.9999 95 41.9999 106 30.4999C117 18.9999 126 -3.50014 149 -3.50014C172 -3.50014 187 4.99986 200.5 -8.50014C214 -22.0001 210.5 -46.0001 244 -37.5001C270.8 -30.7001 307.167 -45 322 -53"
+                d="M1 89.9999C8 77.3332 27.7 50.7999 50.5 45.9999C79 39.9999 95 41.9999 106 30.4999C117 18.9999 126 -3.50014 162 2.99986"
                 stroke="url(#paint0_linear_1028_603)"
               />
               <path
                 opacity="0.45"
-                d="M43 64.9999C50 52.3332 69.7 25.7999 92.5 20.9999C121 14.9999 137 16.9999 148 5.49986C159 -6.00014 168 -28.5001 191 -28.5001C214 -28.5001 229 -20.0001 242.5 -33.5001C256 -47.0001 252.5 -71.0001 286 -62.5001C312.8 -55.7001 349.167 -70 364 -78"
+                d="M43 64.9999C50 52.3332 69.7 25.7999 92.5 20.9999C121 14.9999 137 16.9999 148 5.49986C159 -6.00014 168 -28.5001 204 -22.0001"
                 stroke="url(#paint1_linear_1028_603)"
               />
               <path
                 opacity="0.45"
-                d="M4 73.9999C11 61.3332 30.7 34.7999 53.5 29.9999C82 23.9999 98 25.9999 109 14.4999C120 2.99986 129 -19.5001 152 -19.5001C175 -19.5001 190 -11.0001 203.5 -24.5001C217 -38.0001 213.5 -62.0001 247 -53.5001C273.8 -46.7001 310.167 -61 325 -69"
+                d="M4 73.9999C11 61.3332 30.7 34.7999 53.5 29.9999C82 23.9999 98 25.9999 109 14.4999C120 2.99986 129 -19.5001 165 -13.0001"
                 stroke="url(#paint2_linear_1028_603)"
               />
               <path
                 opacity="0.45"
-                d="M41 40.9999C48 28.3332 67.7 1.79986 90.5 -3.00014C119 -9.00014 135 -7.00014 146 -18.5001C157 -30.0001 166 -52.5001 189 -52.5001C212 -52.5001 227 -44.0001 240.5 -57.5001C254 -71.0001 250.5 -95.0001 284 -86.5001C310.8 -79.7001 347.167 -94 362 -102"
+                d="M33 90.9999C40 78.3332 59.7 51.7999 82.5 46.9999C111 40.9999 127 42.9999 138 31.4999C149 19.9999 158 -2.50014 194 4.00086"
                 stroke="url(#paint3_linear_1028_603)"
               />
             </g>
             <defs>
               <linearGradient
                 id="paint0_linear_1028_603"
-                x1="291.35"
-                y1="12.1032"
-                x2="179.211"
-                y2="237.617"
+                x1="4.1568"
+                y1="101.33"
+                x2="184.344"
+                y2="50.5795"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  offset="0.328125"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0.51" />
               </linearGradient>
               <linearGradient
                 id="paint1_linear_1028_603"
-                x1="333.35"
-                y1="-12.8968"
-                x2="221.211"
-                y2="212.617"
+                x1="46.1568"
+                y1="76.33"
+                x2="226.344"
+                y2="25.5795"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  offset="0.328125"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0.51" />
               </linearGradient>
               <linearGradient
                 id="paint2_linear_1028_603"
-                x1="294.35"
-                y1="-3.89678"
-                x2="182.211"
-                y2="221.617"
+                x1="7.1568"
+                y1="85.33"
+                x2="187.344"
+                y2="34.5795"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  offset="0.328125"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0.51" />
               </linearGradient>
               <linearGradient
                 id="paint3_linear_1028_603"
-                x1="331.35"
-                y1="-36.8968"
-                x2="219.211"
-                y2="188.617"
+                x1="36.1568"
+                y1="102.33"
+                x2="216.344"
+                y2="51.5795"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop
-                  offset="0.328125"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                />
-                <stop
-                  offset="1"
-                  stopColor={theme === "light" ? "#4A6CF7" : "#fff"}
-                  stopOpacity="0"
-                />
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0.51" />
               </linearGradient>
             </defs>
           </svg>

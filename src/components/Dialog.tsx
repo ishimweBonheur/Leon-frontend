@@ -1,4 +1,4 @@
-'use client';
+
 
 import { ReactNode } from 'react';
 import { X } from 'lucide-react'; // Or use another close icon
@@ -15,13 +15,11 @@ export function Dialog({ open, onOpenChange, children, className }: DialogProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop with fade-in animation */}
       <div 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
         onClick={() => onOpenChange(false)}
       />
       
-      {/* Dialog container with slide-in animation */}
       <div 
         className={`
           relative z-50 
@@ -109,7 +107,7 @@ interface DialogFooterProps {
 
 export function DialogFooter({ children, className }: DialogFooterProps) {
   return (
-    <div className={`border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-end gap-2 ${className}`}>
+    <div className={`border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-end gap-2  ${className}`}>
       {children}
     </div>
   );

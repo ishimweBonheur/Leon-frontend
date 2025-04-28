@@ -18,17 +18,35 @@ export default function ContactsPage() {
   const [selectedContact, setSelectedContact] = useState<SelectedContact | null>(null);
   const [open, setOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8); // Items per page
+  const [itemsPerPage] = useState(5); // Reduced from 8 to 5 for better readability
 
   useEffect(() => {
     fetchContacts();
   }, []);
 
-  // Pagination logic
+  // Pagination calculations
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = contacts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(contacts.length / itemsPerPage);
+
+  // Navigation functions
+  const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Smart pagination range to avoid showing too many buttons
+  const getPaginationRange = () => {
+    const totalNumbers = 3; // Show 3 page numbers at a time
+    let start = Math.max(1, currentPage - Math.floor(totalNumbers / 2));
+    let end = Math.min(totalPages, start + totalNumbers - 1);
+    
+    if (end - start + 1 < totalNumbers) {
+      start = Math.max(1, end - totalNumbers + 1);
+    }
+    
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
 
   const handleViewContact = (contact: SelectedContact) => {
     setSelectedContact(contact);
@@ -48,36 +66,42 @@ export default function ContactsPage() {
     }
   };
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
   return (
     <div className="container mx-auto px-4 py-6">
-      {/* SVG Background Elements */}
+      {/* Decorative SVG background elements */}
       <div className="absolute inset-0 overflow-hidden opacity-50 dark:opacity-20">
-        <svg className="absolute -left-20 -top-20 w-96 h-96 text-blue-100 dark:text-blue-900" fill="currentColor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <path d="M40,-57.4C53.7,-49.6,68.1,-41.6,74.1,-29.4C80.1,-17.1,77.7,-0.6,72.7,13.9C67.7,28.4,60.1,40.9,48.8,52.1C37.5,63.3,22.5,73.2,5.9,76.1C-10.7,79.1,-28.9,75.2,-43.4,65.6C-57.9,56,-68.7,40.8,-73.5,23.7C-78.3,6.6,-77.1,-12.3,-68.8,-27.9C-60.5,-43.5,-45.1,-55.8,-30.3,-63.1C-15.5,-70.4,-1.3,-72.7,11.3,-68.1C23.9,-63.5,26.3,-52,40,-57.4Z" transform="translate(100 100)" />
+        <svg className="absolute -left-20 -top-20 w-96 h-96 text-blue-100 dark:text-blue-900" fill="currentColor" viewBox="0 0 200 200">
+          <path d="M40,-57.4C53.7,-49.6..." transform="translate(100 100)" />
         </svg>
-        <svg className="absolute -right-20 -bottom-20 w-96 h-96 text-indigo-100 dark:text-indigo-900" fill="currentColor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <path d="M44.4,-65.4C56.9,-56.6,66.1,-43.5,71.5,-28.8C76.9,-14.1,78.5,2.3,74.2,16.2C69.9,30.1,59.7,41.6,47.2,52.7C34.7,63.8,19.9,74.5,2.3,75.8C-15.3,77.1,-30.6,69,-45.3,58.6C-60,48.2,-74.1,35.5,-79.1,19.6C-84.1,3.7,-80,-15.4,-70.3,-31.5C-60.6,-47.6,-45.2,-60.7,-29.8,-68.5C-14.4,-76.3,1.1,-78.8,16.5,-75.1C31.8,-71.4,31.9,-74.2,44.4,-65.4Z" transform="translate(100 100)" />
+        <svg className="absolute -right-20 -bottom-20 w-96 h-96 text-indigo-100 dark:text-indigo-900" fill="currentColor" viewBox="0 0 200 200">
+          <path d="M44.4,-65.4C56.9,-56.6..." transform="translate(100 100)" />
         </svg>
       </div>
 
       <div className="relative max-w-6xl mx-auto">
-        {/* Header with stats */}
+        {/* Header section with stats */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Contact Messages</h1>
               <p className="text-gray-600 dark:text-gray-400">Manage all incoming messages</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow px-4 py-3">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                Total Messages: <span className="text-blue-600 dark:text-blue-400 font-semibold">{contacts.length}</span>
-              </p>
+            <div className="flex items-center gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow px-4 py-3">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Total: <span className="text-blue-600 dark:text-blue-400 font-semibold">{contacts.length}</span>
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow px-4 py-3">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Page: <span className="text-blue-600 dark:text-blue-400 font-semibold">{currentPage}/{totalPages}</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Main content area */}
         {contacts.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,44 +164,59 @@ export default function ContactsPage() {
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Enhanced pagination controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-2">
-                <button
-                  onClick={() => paginate(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Previous
-                </button>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, contacts.length)} of {contacts.length}
+                </div>
+                <div className="flex items-center gap-2">
                   <button
-                    key={number}
-                    onClick={() => paginate(number)}
-                    className={`w-10 h-10 rounded-md flex items-center justify-center ${currentPage === number 
-                      ? 'bg-blue-600 text-white' 
-                      : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                    onClick={prevPage}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
                   >
-                    {number}
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Previous
                   </button>
-                ))}
-                
-                <button
-                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Next
-                </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {getPaginationRange().map((number) => (
+                      <button
+                        key={number}
+                        onClick={() => paginate(number)}
+                        className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                          currentPage === number
+                            ? 'bg-blue-600 text-white'
+                            : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {number}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <button
+                    onClick={nextPage}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
+                  >
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             )}
           </>
         )}
 
-        {/* Contact Details Modal */}
+        {/* Contact details modal with improved scrolling */}
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent >
+          <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
             <DialogHeader>
               <div className="flex items-center gap-3">
                 <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
@@ -186,14 +225,14 @@ export default function ContactsPage() {
                   </svg>
                 </div>
                 <div>
-                  <DialogTitle >Contact Details</DialogTitle>
-                  <DialogDescription >Full message and contact information</DialogDescription>
+                  <DialogTitle>Contact Details</DialogTitle>
+                  <DialogDescription>Full message and contact information</DialogDescription>
                 </div>
               </div>
             </DialogHeader>
 
             {selectedContact && (
-              <div className="space-y-4 py-4">
+              <div className="flex-1 overflow-y-auto space-y-4 py-4">
                 <div className="flex items-start gap-4">
                   <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -228,7 +267,11 @@ export default function ContactsPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Message</h3>
-                    <p className="mt-1 text-gray-700 dark:text-gray-300 whitespace-pre-line">{selectedContact.message}</p>
+                    <div className="mt-1 p-3   rounded-lg  ">
+                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line break-words">
+                        {selectedContact.message}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -251,7 +294,251 @@ export default function ContactsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+ 
       </div>
+   
+      <div className="absolute right-0 top-0 z-[-1] opacity-30 lg:opacity-100">
+          <svg
+            width="450"
+            height="556"
+            viewBox="0 0 450 556"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="277"
+              cy="63"
+              r="225"
+              fill="url(#paint0_linear_25:217)"
+            />
+            <circle
+              cx="17.9997"
+              cy="182"
+              r="18"
+              fill="url(#paint1_radial_25:217)"
+            />
+            <circle
+              cx="76.9997"
+              cy="288"
+              r="34"
+              fill="url(#paint2_radial_25:217)"
+            />
+            <circle
+              cx="325.486"
+              cy="302.87"
+              r="180"
+              transform="rotate(-37.6852 325.486 302.87)"
+              fill="url(#paint3_linear_25:217)"
+            />
+            <circle
+              opacity="0.8"
+              cx="184.521"
+              cy="315.521"
+              r="132.862"
+              transform="rotate(114.874 184.521 315.521)"
+              stroke="url(#paint4_linear_25:217)"
+            />
+            <circle
+              opacity="0.8"
+              cx="356"
+              cy="290"
+              r="179.5"
+              transform="rotate(-30 356 290)"
+              stroke="url(#paint5_linear_25:217)"
+            />
+            <circle
+              opacity="0.8"
+              cx="191.659"
+              cy="302.659"
+              r="133.362"
+              transform="rotate(133.319 191.659 302.659)"
+              fill="url(#paint6_linear_25:217)"
+            />
+            <defs>
+              <linearGradient
+                id="paint0_linear_25:217"
+                x1="-54.5003"
+                y1="-178"
+                x2="222"
+                y2="288"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              </linearGradient>
+              <radialGradient
+                id="paint1_radial_25:217"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(17.9997 182) rotate(90) scale(18)"
+              >
+                <stop offset="0.145833" stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0.08" />
+              </radialGradient>
+              <radialGradient
+                id="paint2_radial_25:217"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(76.9997 288) rotate(90) scale(34)"
+              >
+                <stop offset="0.145833" stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0.08" />
+              </radialGradient>
+              <linearGradient
+                id="paint3_linear_25:217"
+                x1="226.775"
+                y1="-66.1548"
+                x2="292.157"
+                y2="351.421"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient
+                id="paint4_linear_25:217"
+                x1="184.521"
+                y1="182.159"
+                x2="184.521"
+                y2="448.882"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="white" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient
+                id="paint5_linear_25:217"
+                x1="356"
+                y1="110"
+                x2="356"
+                y2="470"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="white" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient
+                id="paint6_linear_25:217"
+                x1="118.524"
+                y1="29.2497"
+                x2="166.965"
+                y2="338.63"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div className="absolute bottom-0 left-0 z-[-1] opacity-30 lg:opacity-100">
+          <svg
+            width="364"
+            height="201"
+            viewBox="0 0 364 201"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5.88928 72.3303C33.6599 66.4798 101.397 64.9086 150.178 105.427C211.155 156.076 229.59 162.093 264.333 166.607C299.076 171.12 337.718 183.657 362.889 212.24"
+              stroke="url(#paint0_linear_25:218)"
+            />
+            <path
+              d="M-22.1107 72.3303C5.65989 66.4798 73.3965 64.9086 122.178 105.427C183.155 156.076 201.59 162.093 236.333 166.607C271.076 171.12 309.718 183.657 334.889 212.24"
+              stroke="url(#paint1_linear_25:218)"
+            />
+            <path
+              d="M-53.1107 72.3303C-25.3401 66.4798 42.3965 64.9086 91.1783 105.427C152.155 156.076 170.59 162.093 205.333 166.607C240.076 171.12 278.718 183.657 303.889 212.24"
+              stroke="url(#paint2_linear_25:218)"
+            />
+            <path
+              d="M-98.1618 65.0889C-68.1416 60.0601 4.73364 60.4882 56.0734 102.431C120.248 154.86 139.905 161.419 177.137 166.956C214.37 172.493 255.575 186.165 281.856 215.481"
+              stroke="url(#paint3_linear_25:218)"
+            />
+            <circle
+              opacity="0.8"
+              cx="214.505"
+              cy="60.5054"
+              r="49.7205"
+              transform="rotate(-13.421 214.505 60.5054)"
+              stroke="url(#paint4_linear_25:218)"
+            />
+            <circle cx="220" cy="63" r="43" fill="url(#paint5_radial_25:218)" />
+            <defs>
+              <linearGradient
+                id="paint0_linear_25:218"
+                x1="184.389"
+                y1="69.2405"
+                x2="184.389"
+                y2="212.24"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" />
+              </linearGradient>
+              <linearGradient
+                id="paint1_linear_25:218"
+                x1="156.389"
+                y1="69.2405"
+                x2="156.389"
+                y2="212.24"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" />
+              </linearGradient>
+              <linearGradient
+                id="paint2_linear_25:218"
+                x1="125.389"
+                y1="69.2405"
+                x2="125.389"
+                y2="212.24"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" />
+              </linearGradient>
+              <linearGradient
+                id="paint3_linear_25:218"
+                x1="93.8507"
+                y1="67.2674"
+                x2="89.9278"
+                y2="210.214"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" stopOpacity="0" />
+                <stop offset="1" stopColor="#4A6CF7" />
+              </linearGradient>
+              <linearGradient
+                id="paint4_linear_25:218"
+                x1="214.505"
+                y1="10.2849"
+                x2="212.684"
+                y2="99.5816"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#4A6CF7" />
+                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              </linearGradient>
+              <radialGradient
+                id="paint5_radial_25:218"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(220 63) rotate(90) scale(43)"
+              >
+                <stop offset="0.145833" stopColor="white" stopOpacity="0" />
+                <stop offset="1" stopColor="white" stopOpacity="0.08" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>  
     </div>
+    
   );
 }

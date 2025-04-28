@@ -219,7 +219,6 @@ export default function UsersPage() {
             
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                // Show pages around current page
                 let pageNum;
                 if (totalPages <= 5) {
                   pageNum = i + 1;
@@ -263,7 +262,6 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Edit Modal (unchanged) */}
       <Dialog open={!!editingUser} onClose={() => setEditingUser(null)} className="relative z-50">
       <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">

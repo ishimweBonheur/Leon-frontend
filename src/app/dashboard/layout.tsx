@@ -11,8 +11,8 @@ import {
   Settings,
   House,
   X,
-  AppWindow ,
-  MessagesSquare ,
+  AppWindow,
+  MessagesSquare,
 } from "lucide-react";
 import LanguageSelector from "@/components/GoogleTranslate";
 import { isLoggedIn } from "@/Hooks/useAuth";
@@ -99,20 +99,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Link href="/dashboard/jobs" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
             <Briefcase className="w-5 h-5 mr-3" /> Manage Jobs
           </Link>
-          <Link href="/dashboard/users" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
-            <Users className="w-5 h-5 mr-3" /> Users
-          </Link>
+
+          <div className="group">
+            <div className="flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer transition-colors duration-200">
+              <div className="flex items-center">
+                <Users className="w-5 h-5 mr-3" />
+                Users
+              </div>
+              <svg className="w-4 h-4 ml-1 transform group-hover:rotate-180 transition-transform duration-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.2l3.71-3.97a.75.75 0 111.1 1.02l-4.25 4.5a.75.75 0 01-1.1 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="hidden group-hover:block ml-8 mt-2 space-y-1">
+              <Link href="/dashboard/users" className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+                Manage Users
+              </Link>
+              <Link href="/dashboard/subscriptions" className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
+                Manage Subscriptions
+              </Link>
+            </div>
+          </div>
+
           <Link href="/dashboard/applications" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
-            <AppWindow  className="w-5 h-5 mr-3" /> Applications
+            <AppWindow className="w-5 h-5 mr-3" /> Applications
           </Link>
           <Link href="/dashboard/messages" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
-            <MessagesSquare  className="w-5 h-5 mr-3" /> Messages
+            <MessagesSquare className="w-5 h-5 mr-3" /> Messages
           </Link>
           <Link href="/dashboard/settings" className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200">
             <Settings className="w-5 h-5 mr-3" /> Settings
           </Link>
-
         </nav>
+
       </aside>
 
       {/* Main Content */}
@@ -166,7 +184,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
-  
+
     </div>
   );
 }
