@@ -4,9 +4,13 @@ export const emailTemplates = {
     jobTitle: string,
     firstName: string,
     getApplicationById: string
+
+
   ) => ({
+    
     subject: "Your Application Status Has Been Updated",
     text: `Hi ${firstName},
+
 
 Good news! The status of your application for the position of "${jobTitle}" has been updated to: ${status}.
 
@@ -24,7 +28,7 @@ The Recruitment Team`,
         <strong>${jobTitle}</strong> has been 
         <strong style="color: #1a73e8;">${status}</strong>.</p>
 
-        <p>Thank you for applying and taking the time to go through our recruitment process.</p>
+        <p>Thank you for applying and taking the time to go through our recruitment process.  ${getApplicationById}</p>
 
         <p>Best regards,<br/>The Recruitment Team</p>
       </div>

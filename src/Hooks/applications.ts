@@ -97,7 +97,6 @@ export const useJobApplication = () => {
     }
   };
 
-  // Send an email (you can use a service like SendGrid or Nodemailer here)
   const sendEmail = async (to: string, subject: string, message: string) => {
     try {
       await axios.post("/api/email", { to, subject, message });
@@ -142,6 +141,7 @@ export const useJobApplication = () => {
       setLoading(false);
     }
   };
+  
 
   const getApplicationsByStatus = async (status: string) => {
     setLoading(true);
