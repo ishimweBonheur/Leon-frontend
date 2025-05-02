@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Globe } from "lucide-react";
 
 declare global {
   interface Window {
@@ -9,6 +10,12 @@ declare global {
   }
 }
 
+const languageOptions = [
+  { code: "en", name: "English",  },
+  { code: "fr", name: "Français",  },
+  { code: "sw", name: "Kiswahili",  },
+];
+
 const getCurrentLanguage = () => {
   if (typeof document === "undefined") return "en";
   const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
@@ -16,8 +23,10 @@ const getCurrentLanguage = () => {
 };
 
 const LanguageSelector = () => {
+  const [isMounted, setIsMounted] = useState(false); // Hydration-safe rendering
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(getCurrentLanguage());
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [isOpen, setIsOpen] = useState(false);
 
   const initializeGoogleTranslate = () => {
     if (window.google?.translate?.TranslateElement) {
@@ -58,6 +67,9 @@ const LanguageSelector = () => {
   };
 
   useEffect(() => {
+    setIsMounted(true); // Set after first render
+    setSelectedLanguage(getCurrentLanguage());
+
     window.googleTranslateElementInit = initializeGoogleTranslate;
 
     if (!window.google?.translate?.TranslateElement) {
@@ -72,6 +84,7 @@ const LanguageSelector = () => {
         display: none !important;
       }
       body { top: 0px !important; }
+      .skiptranslate iframe { display: none !important; }
     `;
     document.head.appendChild(style);
 
@@ -87,10 +100,10 @@ const LanguageSelector = () => {
   const changeLanguage = (langCode: string) => {
     if (!isLoaded) return;
 
-    // ✅ No domain included for Vercel compatibility
     document.cookie = `googtrans=/en/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
 
     setSelectedLanguage(langCode);
+    setIsOpen(false);
 
     const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
     if (translateSelect) {
@@ -99,24 +112,95 @@ const LanguageSelector = () => {
       translateSelect.dispatchEvent(event);
     }
 
-    // Optional: reload to apply language
     setTimeout(() => {
       window.location.reload();
     }, 100);
   };
 
+  const currentLanguage = languageOptions.find(
+    (lang) => lang.code === selectedLanguage
+  );
+  if (!isMounted) return null;
+
   return (
-    <div style={{ position: "relative", zIndex: 1000 }}>
-      <select
-        onChange={(e) => changeLanguage(e.target.value)}
-        value={selectedLanguage}
-        className="border-stroke rounded-lg border bg-[#f8f8f8] px-4 py-2 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-        id="languageSwitcher"
-      >
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-        <option value="sw">Swahili</option>
-      </select>
+    <div className="relative z-50">
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center justify-center p-2 rounded-full bg-white dark:bg-gray-800 shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Change language"
+        >
+          <Globe className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        </button>
+
+        {isOpen && (
+          <div className="absolute right-0 mt-2 w-20 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+            {languageOptions.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => changeLanguage(lang.code)}
+                className={`flex items-center w-full px-4 py-2 text-left text-sm ${
+                  selectedLanguage === lang.code
+                    ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <div className="relative inline-block">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center space-x-1 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700"
+          >
+            <Globe className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {currentLanguage?.name}
+            </span>
+            <svg
+              className={`w-4 h-4 ml-1 text-gray-500 transition-transform duration-200 ${
+                isOpen ? "transform rotate-180" : ""
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {isOpen && (
+            <div className="absolute right-0 mt-2 w-30 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+              {languageOptions.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => changeLanguage(lang.code)}
+                  className={`flex items-center w-full px-4 py-2 text-left text-sm ${
+                    selectedLanguage === lang.code
+                      ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {lang.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div id="google_translate_element" style={{ display: "none" }}></div>
     </div>
   );
