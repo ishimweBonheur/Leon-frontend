@@ -16,16 +16,17 @@ const languageOptions = [
   { code: "sw", name: "Kiswahili" },
 ];
 
-const getBrowserLanguage = (): string => {
-  if (typeof navigator === 'undefined') return 'en';
-  const lang = navigator.language || (navigator as any).userLanguage;
-  return lang.substring(0, 2).toLowerCase();
+const getCurrentLanguage = () => {
+  if (typeof document === "undefined") return "en";
+  const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
+  return match ? match[1] : "en";
 };
 
-const getCurrentLanguage = (): string => {
-  if (typeof document === "undefined") return getBrowserLanguage();
-  const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
-  return match ? match[1] : getBrowserLanguage();
+const detectBrowserLanguage = (): string => {
+  if (typeof navigator === "undefined") return "en";
+  const lang = navigator.language || "en";
+  const shortLang = lang.split("-")[0]; // 'en-US' → 'en'
+  return languageOptions.some((opt) => opt.code === shortLang) ? shortLang : "en";
 };
 
 const LanguageSelector = () => {
@@ -47,14 +48,6 @@ const LanguageSelector = () => {
       );
       setIsLoaded(true);
       removeTranslateBanner();
-
-      // Set language based on browser or cookie after initialization
-      const currentLang = getCurrentLanguage();
-      if (languageOptions.some(lang => lang.code === currentLang) && currentLang !== 'en') {
-        setTimeout(() => {
-          changeLanguage(currentLang, false);
-        }, 500);
-      }
     }
   };
 
@@ -80,32 +73,18 @@ const LanguageSelector = () => {
     }
   };
 
-  const changeLanguage = (langCode: string, reload: boolean = true) => {
-    if (!isLoaded) return;
-
-    document.cookie = `googtrans=/en/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
-    setSelectedLanguage(langCode);
-    setIsOpen(false);
-
-    const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
-    if (translateSelect) {
-      translateSelect.value = langCode;
-      const event = new Event("change", { bubbles: true });
-      translateSelect.dispatchEvent(event);
-    }
-
-    if (reload) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
-    }
-  };
-
   useEffect(() => {
     setIsMounted(true);
-    const browserLang = getBrowserLanguage();
+
+    const browserLang = detectBrowserLanguage();
     const currentLang = getCurrentLanguage();
-    setSelectedLanguage(currentLang);
+
+    if (browserLang !== currentLang) {
+      document.cookie = `googtrans=/en/${browserLang}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+      setSelectedLanguage(browserLang);
+    } else {
+      setSelectedLanguage(currentLang);
+    }
 
     window.googleTranslateElementInit = initializeGoogleTranslate;
 
@@ -134,9 +113,26 @@ const LanguageSelector = () => {
     };
   }, []);
 
-  const currentLanguage = languageOptions.find(
-    (lang) => lang.code === selectedLanguage
-  ) || languageOptions[0];
+  const changeLanguage = (langCode: string) => {
+    if (!isLoaded) return;
+
+    document.cookie = `googtrans=/en/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    setSelectedLanguage(langCode);
+    setIsOpen(false);
+
+    const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+    if (translateSelect) {
+      translateSelect.value = langCode;
+      const event = new Event("change", { bubbles: true });
+      translateSelect.dispatchEvent(event);
+    }
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  };
+
+  const currentLanguage = languageOptions.find((lang) => lang.code === selectedLanguage);
 
   if (!isMounted) return null;
 
@@ -153,7 +149,7 @@ const LanguageSelector = () => {
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-20 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+          <div className="absolute right-0 mt-2 w-24 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
             {languageOptions.map((lang) => (
               <button
                 key={lang.code}
@@ -180,22 +176,17 @@ const LanguageSelector = () => {
           >
             <Globe className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {currentLanguage.name}
+              {currentLanguage?.name}
             </span>
             <svg
               className={`w-4 h-4 ml-1 text-gray-500 transition-transform duration-200 ${
-                isOpen ? "transform rotate-180" : ""
+                isOpen ? "rotate-180" : ""
               }`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
