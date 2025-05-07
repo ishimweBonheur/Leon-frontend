@@ -31,7 +31,7 @@ const SignupPage = () => {
     e.preventDefault();
     try {
       await addUser(formData);
-      router.push("/signin");
+      router.push("/");
     } catch (error) {
       console.error("Error during registration:", error);
     }
@@ -170,12 +170,6 @@ const SignupPage = () => {
                     required
                     className="w-full rounded-md border border-gray-300 bg-[#f8f8f8] px-4 py-2.5 text-sm text-body-color outline-none transition-all duration-300 focus:border-primary focus:ring-1 focus:ring-primary dark:border-transparent dark:bg-[#2C303B]"
                   />
-                </div>
-
-                <div className="mb-6">
-                  <label htmlFor="role" className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                    Account Type
-                  </label>
                 </div>
 
                 <button

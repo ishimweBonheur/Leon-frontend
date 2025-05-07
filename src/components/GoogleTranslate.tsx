@@ -11,19 +11,25 @@ declare global {
 }
 
 const languageOptions = [
-  { code: "en", name: "English",  },
-  { code: "fr", name: "Français",  },
-  { code: "sw", name: "Kiswahili",  },
+  { code: "en", name: "English" },
+  { code: "fr", name: "Français" },
+  { code: "sw", name: "Kiswahili" },
 ];
 
-const getCurrentLanguage = () => {
-  if (typeof document === "undefined") return "en";
+const getBrowserLanguage = (): string => {
+  if (typeof navigator === 'undefined') return 'en';
+  const lang = navigator.language || (navigator as any).userLanguage;
+  return lang.substring(0, 2).toLowerCase();
+};
+
+const getCurrentLanguage = (): string => {
+  if (typeof document === "undefined") return getBrowserLanguage();
   const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
-  return match ? match[1] : "en";
+  return match ? match[1] : getBrowserLanguage();
 };
 
 const LanguageSelector = () => {
-  const [isMounted, setIsMounted] = useState(false); // Hydration-safe rendering
+  const [isMounted, setIsMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +47,14 @@ const LanguageSelector = () => {
       );
       setIsLoaded(true);
       removeTranslateBanner();
+
+      // Set language based on browser or cookie after initialization
+      const currentLang = getCurrentLanguage();
+      if (languageOptions.some(lang => lang.code === currentLang) && currentLang !== 'en') {
+        setTimeout(() => {
+          changeLanguage(currentLang, false);
+        }, 500);
+      }
     }
   };
 
@@ -66,9 +80,32 @@ const LanguageSelector = () => {
     }
   };
 
+  const changeLanguage = (langCode: string, reload: boolean = true) => {
+    if (!isLoaded) return;
+
+    document.cookie = `googtrans=/en/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    setSelectedLanguage(langCode);
+    setIsOpen(false);
+
+    const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+    if (translateSelect) {
+      translateSelect.value = langCode;
+      const event = new Event("change", { bubbles: true });
+      translateSelect.dispatchEvent(event);
+    }
+
+    if (reload) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    }
+  };
+
   useEffect(() => {
-    setIsMounted(true); // Set after first render
-    setSelectedLanguage(getCurrentLanguage());
+    setIsMounted(true);
+    const browserLang = getBrowserLanguage();
+    const currentLang = getCurrentLanguage();
+    setSelectedLanguage(currentLang);
 
     window.googleTranslateElementInit = initializeGoogleTranslate;
 
@@ -97,29 +134,10 @@ const LanguageSelector = () => {
     };
   }, []);
 
-  const changeLanguage = (langCode: string) => {
-    if (!isLoaded) return;
-
-    document.cookie = `googtrans=/en/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
-
-    setSelectedLanguage(langCode);
-    setIsOpen(false);
-
-    const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
-    if (translateSelect) {
-      translateSelect.value = langCode;
-      const event = new Event("change", { bubbles: true });
-      translateSelect.dispatchEvent(event);
-    }
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
-  };
-
   const currentLanguage = languageOptions.find(
     (lang) => lang.code === selectedLanguage
-  );
+  ) || languageOptions[0];
+
   if (!isMounted) return null;
 
   return (
@@ -162,7 +180,7 @@ const LanguageSelector = () => {
           >
             <Globe className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {currentLanguage?.name}
+              {currentLanguage.name}
             </span>
             <svg
               className={`w-4 h-4 ml-1 text-gray-500 transition-transform duration-200 ${
