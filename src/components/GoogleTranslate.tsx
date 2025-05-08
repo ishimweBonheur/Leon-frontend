@@ -18,14 +18,14 @@ const languageOptions = [
 
 const getCurrentLanguage = () => {
   if (typeof document === "undefined") return "en";
-  const match = document.cookie.match(/googtrans=\/en\/(\w+)/);
+  const match = document.cookie.match(/googtrans=\/\w+\/(\w+)/);
   return match ? match[1] : "en";
 };
 
 const detectBrowserLanguage = (): string => {
   if (typeof navigator === "undefined") return "en";
   const lang = navigator.language || "en";
-  const shortLang = lang.split("-")[0]; // 'en-US' → 'en'
+  const shortLang = lang.split("-")[0];
   return languageOptions.some((opt) => opt.code === shortLang) ? shortLang : "en";
 };
 
@@ -76,13 +76,15 @@ const LanguageSelector = () => {
   useEffect(() => {
     setIsMounted(true);
 
-    const browserLang = detectBrowserLanguage();
-    const currentLang = getCurrentLanguage();
+    const hasManualSelection = document.cookie.includes("manual_lang_set=true");
 
-    if (browserLang !== currentLang) {
-      document.cookie = `googtrans=/en/${browserLang}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    if (!hasManualSelection) {
+      const browserLang = detectBrowserLanguage();
+      document.cookie = `googtrans=/auto/${browserLang}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+      document.cookie = `manual_lang_set=false; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
       setSelectedLanguage(browserLang);
     } else {
+      const currentLang = getCurrentLanguage();
       setSelectedLanguage(currentLang);
     }
 
@@ -109,27 +111,49 @@ const LanguageSelector = () => {
 
     return () => {
       observer.disconnect();
-      document.head.removeChild(style);
+      if (style.parentNode) {
+        document.head.removeChild(style);
+      }
     };
   }, []);
 
   const changeLanguage = (langCode: string) => {
-    if (!isLoaded) return;
-
-    document.cookie = `googtrans=/en/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    if (langCode === selectedLanguage) {
+      setIsOpen(false);
+      return;
+    }
+    
+    // Set cookies for both domain and path
+    const cookieDomain = window.location.hostname;
+    
+    // Set cookies for domain root
+    document.cookie = `googtrans=/auto/${langCode}; domain=${cookieDomain}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    document.cookie = `googtrans=/auto/${langCode}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    
+    // Set for subdomain if needed
+    if (cookieDomain.indexOf('.') !== -1) {
+      document.cookie = `googtrans=/auto/${langCode}; domain=.${cookieDomain}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    }
+    
+    document.cookie = `manual_lang_set=true; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    
     setSelectedLanguage(langCode);
     setIsOpen(false);
 
+    // Force translation by selecting the language in Google's dropdown
     const translateSelect = document.querySelector(".goog-te-combo") as HTMLSelectElement;
     if (translateSelect) {
       translateSelect.value = langCode;
-      const event = new Event("change", { bubbles: true });
-      translateSelect.dispatchEvent(event);
-    }
-
-    setTimeout(() => {
+      translateSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      
+      // Force page reload to apply changes
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } else {
+      // If select element not found, reload directly
       window.location.reload();
-    }, 100);
+    }
   };
 
   const currentLanguage = languageOptions.find((lang) => lang.code === selectedLanguage);
